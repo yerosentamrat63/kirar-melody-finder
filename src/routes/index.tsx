@@ -6,6 +6,8 @@ import {
   matchKignit,
   PITCH_NAMES,
   KIGNITS,
+  scaleNotes,
+  scaleIntervals,
   type KignitMatch,
 } from "@/lib/pitch";
 
@@ -246,6 +248,25 @@ function Index() {
                       <p className="mt-1 text-sm text-amber-200/70">
                         {m.kignit.description}
                       </p>
+                      <div className="mt-3">
+                        <div className="text-[10px] uppercase tracking-wider text-amber-300/60">
+                          Scale · {scaleIntervals(m.kignit).join("-")} semitones
+                        </div>
+                        <div className="mt-1 flex flex-wrap gap-1.5">
+                          {scaleNotes(m.kignit, m.tonic).map((n, i) => (
+                            <span
+                              key={i}
+                              className={`rounded-md px-2 py-0.5 text-xs font-mono ${
+                                i === 0
+                                  ? "bg-amber-400 text-[#1a0f08]"
+                                  : "border border-amber-500/30 bg-amber-500/5 text-amber-100"
+                              }`}
+                            >
+                              {n}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                     <div className="shrink-0 text-right">
                       <div className="text-2xl font-bold text-amber-300">
@@ -263,11 +284,30 @@ function Index() {
         )}
 
         <section className="mt-10 rounded-2xl border border-amber-500/15 bg-black/20 p-5 text-sm text-amber-200/70">
-          <h3 className="mb-2 font-semibold text-amber-200">About the ቅኝቶች</h3>
-          <ul className="space-y-1">
+          <h3 className="mb-3 font-semibold text-amber-200">About the ቅኝቶች</h3>
+          <ul className="space-y-3">
             {KIGNITS.map((k) => (
               <li key={k.name}>
-                <span className="text-amber-300">{k.amharic}</span> — {k.name}: {k.description}
+                <div>
+                  <span className="text-amber-300">{k.amharic}</span> —{" "}
+                  <span className="text-amber-100">{k.name}</span>: {k.description}
+                </div>
+                <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                  <span className="text-[10px] uppercase tracking-wider text-amber-300/60">
+                    in C:
+                  </span>
+                  {scaleNotes(k, 0).map((n, i) => (
+                    <span
+                      key={i}
+                      className="rounded-md border border-amber-500/20 bg-amber-500/5 px-1.5 py-0.5 font-mono text-[11px] text-amber-100"
+                    >
+                      {n}
+                    </span>
+                  ))}
+                  <span className="ml-1 text-[10px] text-amber-200/50">
+                    ({scaleIntervals(k).join("-")})
+                  </span>
+                </div>
               </li>
             ))}
           </ul>
