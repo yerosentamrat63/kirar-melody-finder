@@ -248,6 +248,25 @@ function Index() {
                       <p className="mt-1 text-sm text-amber-200/70">
                         {m.kignit.description}
                       </p>
+                      <div className="mt-3">
+                        <div className="text-[10px] uppercase tracking-wider text-amber-300/60">
+                          Scale · {scaleIntervals(m.kignit).join("-")} semitones
+                        </div>
+                        <div className="mt-1 flex flex-wrap gap-1.5">
+                          {scaleNotes(m.kignit, m.tonic).map((n, i) => (
+                            <span
+                              key={i}
+                              className={`rounded-md px-2 py-0.5 text-xs font-mono ${
+                                i === 0
+                                  ? "bg-amber-400 text-[#1a0f08]"
+                                  : "border border-amber-500/30 bg-amber-500/5 text-amber-100"
+                              }`}
+                            >
+                              {n}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                     <div className="shrink-0 text-right">
                       <div className="text-2xl font-bold text-amber-300">
