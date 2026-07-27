@@ -6,6 +6,8 @@ import {
   matchKignit,
   PITCH_NAMES,
   KIGNITS,
+  scaleNotes,
+  scaleIntervals,
   type KignitMatch,
 } from "@/lib/pitch";
 
