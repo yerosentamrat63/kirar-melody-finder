@@ -139,3 +139,26 @@ export function matchKignit(histogram: number[]): KignitMatch[] {
   results.sort((a, b) => b.score - a.score);
   return results;
 }
+
+// Scale degree offsets (semitones from tonic) present in the template.
+export function scaleDegrees(template: KignitTemplate): number[] {
+  const degrees: number[] = [];
+  for (let i = 0; i < 12; i++) if (template.profile[i] > 0) degrees.push(i);
+  return degrees;
+}
+
+// Note names for the scale, starting on `tonic` and wrapping to tonic+octave.
+export function scaleNotes(template: KignitTemplate, tonic: number): string[] {
+  const degs = scaleDegrees(template);
+  const notes = degs.map((d) => PITCH_NAMES[(tonic + d) % 12]);
+  notes.push(PITCH_NAMES[tonic] + "′"); // octave
+  return notes;
+}
+
+// Interval pattern in semitones between successive scale notes (incl. octave return).
+export function scaleIntervals(template: KignitTemplate): number[] {
+  const degs = [...scaleDegrees(template), 12];
+  const ints: number[] = [];
+  for (let i = 1; i < degs.length; i++) ints.push(degs[i] - degs[i - 1]);
+  return ints;
+}
