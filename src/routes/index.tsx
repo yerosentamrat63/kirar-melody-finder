@@ -248,7 +248,13 @@ function Index() {
     const ratio = fromRate / toRate;
     const len = Math.floor(data.length / ratio);
     const out = new Float32Array(len);
-    for (let i = 0; i < len; i++) out[i] = data[Math.floor(i * ratio)];
+    for (let i = 0; i < len; i++) {
+      const start = Math.floor(i * ratio);
+      const end = Math.min(Math.floor((i + 1) * ratio), data.length);
+      let sum = 0;
+      for (let j = start; j < end; j++) sum += data[j];
+      out[i] = sum / (end - start);
+    }
     return out;
   }
 
