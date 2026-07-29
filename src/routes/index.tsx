@@ -244,6 +244,14 @@ function Index() {
     setSelectedDuration(Math.min(fileDuration, MAX_SEGMENT_SECONDS));
   }
 
+  function downsample(data: Float32Array, fromRate: number, toRate: number): Float32Array {
+    const ratio = fromRate / toRate;
+    const len = Math.floor(data.length / ratio);
+    const out = new Float32Array(len);
+    for (let i = 0; i < len; i++) out[i] = data[Math.floor(i * ratio)];
+    return out;
+  }
+
   async function analyzeSegment() {
     const data = audioDataRef.current;
     if (!data) return;
@@ -258,16 +266,17 @@ function Index() {
     const totalSamples = data.length;
     const startSample = Math.floor((segmentStart / 100) * totalSamples);
     const endSample = Math.floor((segmentEnd / 100) * totalSamples);
-    const segmentData = data.slice(startSample, endSample);
+    const segmentData = downsample(data.slice(startSample, endSample), sr, 4000);
+    const analysisSr = 4000;
 
-    const windowSize = 2048;
-    const hop = 1024;
+    const windowSize = 1024;
+    const hop = 512;
     const totalWindows = Math.floor((segmentData.length - windowSize) / hop);
     let lastYield = performance.now();
 
     for (let i = 0; i + windowSize < segmentData.length; i += hop) {
       const slice = segmentData.slice(i, i + windowSize);
-      const freq = autoCorrelate(slice, sr);
+      const freq = autoCorrelate(slice, analysisSr);
       if (freq > 60 && freq < 1500) {
         const pc = freqToPitchClass(freq);
         histRef.current[pc] += 1;
