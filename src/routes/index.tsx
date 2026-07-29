@@ -32,7 +32,7 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-type Status = "idle" | "recording" | "cropping" | "analyzing" | "done" | "error";
+type Status = "idle" | "recording" | "loading" | "cropping" | "analyzing" | "done" | "error";
 
 const MAX_SEGMENT_SECONDS = 60;
 
@@ -187,6 +187,7 @@ function Index() {
     setError(null);
     setMatches([]);
     setFileName(file.name);
+    setStatus("loading");
     try {
       const AC =
         window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -343,7 +344,7 @@ function Index() {
               </button>
             )}
 
-            {status !== "cropping" && (
+            {status !== "cropping" && status !== "loading" && (
               <label className="flex-1 cursor-pointer rounded-xl border border-amber-500/30 bg-amber-500/5 px-5 py-4 text-center font-semibold text-amber-200 transition hover:bg-amber-500/10">
                 📁 Upload Audio
                 <input
@@ -363,6 +364,15 @@ function Index() {
             <p className="mt-4 rounded-lg bg-red-500/15 px-3 py-2 text-sm text-red-300">
               {error}
             </p>
+          )}
+
+          {status === "loading" && (
+            <div className="mt-6">
+              <div className="flex items-center justify-center gap-3 py-6">
+                <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-amber-500/30 border-t-amber-400" />
+                <span className="text-sm text-amber-200/70">Decoding audio…</span>
+              </div>
+            </div>
           )}
 
           {status === "analyzing" && progress > 0 && (
