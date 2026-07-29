@@ -105,6 +105,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
+      {
+        rel: "preconnect",
+        href: "https://fonts.googleapis.com",
+      },
+      {
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com",
+        crossOrigin: "anonymous",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap",
+      },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
       {
         rel: "apple-touch-icon",
@@ -120,23 +133,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function Nav() {
   return (
-    <nav className="flex items-center justify-center gap-1 border-b border-amber-500/10 bg-[#1a0f08]/80 px-4 py-3 backdrop-blur">
-      <Link
-        to="/"
-        className="rounded-lg px-4 py-2 text-sm font-medium text-amber-200/60 transition hover:text-amber-200 aria-[current]:bg-amber-500/10 aria-[current]:text-amber-300"
-        activeProps={{ className: "bg-amber-500/10 text-amber-300" }}
-        inactiveProps={{}}
-      >
-        🎵 Detector
-      </Link>
-      <Link
-        to="/kignits"
-        className="rounded-lg px-4 py-2 text-sm font-medium text-amber-200/60 transition hover:text-amber-200 aria-[current]:bg-amber-500/10 aria-[current]:text-amber-300"
-        activeProps={{ className: "bg-amber-500/10 text-amber-300" }}
-        inactiveProps={{}}
-      >
-        📖 ቅኝቶች Reference
-      </Link>
+    <nav className="flex items-center justify-center border-b border-amber-500/10 bg-[#1a0f08] px-4 py-0">
+      <div className="flex items-center gap-6">
+        <Link
+          to="/"
+          className="relative px-1 py-3.5 text-sm font-medium font-sans tracking-wide text-amber-200/50 transition-colors duration-200 hover:text-amber-200 aria-[current]:text-amber-300"
+          activeProps={{ className: "text-amber-300" }}
+          inactiveProps={{}}
+        >
+          Detector
+          <span className="absolute bottom-0 left-0 right-0 h-px bg-amber-500 opacity-0 transition-opacity duration-200 aria-[current]:opacity-100" />
+        </Link>
+        <Link
+          to="/kignits"
+          className="relative px-1 py-3.5 text-sm font-medium font-sans tracking-wide text-amber-200/50 transition-colors duration-200 hover:text-amber-200 aria-[current]:text-amber-300"
+          activeProps={{ className: "text-amber-300" }}
+          inactiveProps={{}}
+        >
+          ቅኝቶች Reference
+          <span className="absolute bottom-0 left-0 right-0 h-px bg-amber-500 opacity-0 transition-opacity duration-200 aria-[current]:opacity-100" />
+        </Link>
+      </div>
     </nav>
   );
 }
