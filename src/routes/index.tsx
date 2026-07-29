@@ -32,10 +32,66 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-type Status = "idle" | "recording" | "analyzing" | "done" | "error";
+type Status = "idle" | "recording" | "cropping" | "analyzing" | "done" | "error";
+
+const MAX_SEGMENT_SECONDS = 60;
 
 function yieldToMainThread(): Promise<void> {
   return new Promise((r) => setTimeout(r, 16));
+}
+
+function drawWaveform(
+  canvas: HTMLCanvasElement,
+  data: Float32Array,
+  sampleRate: number,
+  startPct: number,
+  endPct: number,
+) {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  const w = canvas.width;
+  const h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const totalSamples = data.length;
+  const pixelsPerSample = totalSamples / w;
+  const peaks = new Float32Array(w);
+  for (let x = 0; x < w; x++) {
+    const start = Math.floor(x * pixelsPerSample);
+    const end = Math.floor((x + 1) * pixelsPerSample);
+    let peak = 0;
+    for (let i = start; i < end && i < totalSamples; i++) {
+      const abs = Math.abs(data[i]);
+      if (abs > peak) peak = abs;
+    }
+    peaks[x] = peak;
+  }
+
+  const mid = h / 2;
+  ctx.beginPath();
+  for (let x = 0; x < w; x++) {
+    const barH = peaks[x] * (h * 0.9);
+    ctx.moveTo(x, mid - barH);
+    ctx.lineTo(x, mid + barH);
+  }
+  ctx.strokeStyle = "rgba(251, 191, 36, 0.4)";
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  const sx = (startPct / 100) * w;
+  const ex = (endPct / 100) * w;
+  ctx.fillStyle = "rgba(251, 191, 36, 0.12)";
+  ctx.fillRect(sx, 0, ex - sx, h);
+
+  ctx.fillStyle = "rgba(251, 191, 36, 0.5)";
+  ctx.fillRect(sx, 0, 2, h);
+  ctx.fillRect(ex - 2, 0, 2, h);
+}
+
+function formatTime(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
 function Index() {
@@ -46,13 +102,29 @@ function Index() {
   const [elapsed, setElapsed] = useState(0);
   const [progress, setProgress] = useState(0);
 
+  const [segmentStart, setSegmentStart] = useState(0);
+  const [segmentEnd, setSegmentEnd] = useState(100);
+  const [fileName, setFileName] = useState("");
+  const [fileDuration, setFileDuration] = useState(0);
+  const [selectedDuration, setSelectedDuration] = useState(0);
+
   const audioCtxRef = useRef<AudioContext | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
   const histRef = useRef<number[]>(new Array(12).fill(0));
   const startTimeRef = useRef<number>(0);
+  const audioDataRef = useRef<Float32Array | null>(null);
+  const sampleRateRef = useRef<number>(0);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => () => cleanup(), []);
+
+  useEffect(() => {
+    const data = audioDataRef.current;
+    if (status === "cropping" && data && canvasRef.current) {
+      drawWaveform(canvasRef.current, data, sampleRateRef.current, segmentStart, segmentEnd);
+    }
+  }, [status, segmentStart, segmentEnd]);
 
   function cleanup() {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -111,47 +183,111 @@ function Index() {
     setStatus("done");
   }
 
-  async function handleFile(file: File) {
+  async function loadFile(file: File) {
     setError(null);
     setMatches([]);
-    setProgress(0);
-    histRef.current = new Array(12).fill(0);
-    setStatus("analyzing");
+    setFileName(file.name);
     try {
       const AC =
         window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       const ctx = new AC();
       const arrayBuf = await file.arrayBuffer();
       const audioBuf = await ctx.decodeAudioData(arrayBuf);
+      ctx.close().catch(() => {});
+
       const data = audioBuf.getChannelData(0);
       const sr = audioBuf.sampleRate;
-      const windowSize = 2048;
-      const hop = 1024;
-      const totalWindows = Math.floor((data.length - windowSize) / hop);
-      let lastYield = performance.now();
-      for (let i = 0; i + windowSize < data.length; i += hop) {
-        const slice = data.slice(i, i + windowSize);
-        const freq = autoCorrelate(slice, sr);
-        if (freq > 60 && freq < 1500) {
-          const pc = freqToPitchClass(freq);
-          histRef.current[pc] += 1;
+      const duration = data.length / sr;
+      audioDataRef.current = data;
+      sampleRateRef.current = sr;
+      setFileDuration(duration);
+
+      const initialEnd = Math.min(100, (MAX_SEGMENT_SECONDS / duration) * 100);
+      setSegmentStart(0);
+      setSegmentEnd(initialEnd);
+      setSelectedDuration(Math.min(duration, MAX_SEGMENT_SECONDS));
+      setStatus("cropping");
+
+      requestAnimationFrame(() => {
+        if (canvasRef.current) {
+          drawWaveform(canvasRef.current, data, sr, 0, initialEnd);
         }
-        const windowIndex = Math.floor(i / hop);
-        if (performance.now() - lastYield > 100) {
-          setProgress(Math.round((windowIndex / totalWindows) * 100));
-          await yieldToMainThread();
-          lastYield = performance.now();
-        }
-      }
-      setHistogram([...histRef.current]);
-      const results = matchKignit(histRef.current);
-      setMatches(results.slice(0, 5));
-      setStatus("done");
-      ctx.close().catch(() => {});
+      });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not decode audio");
       setStatus("error");
     }
+  }
+
+  function handleStartChange(value: number) {
+    const maxEnd = Math.min(100, value + (MAX_SEGMENT_SECONDS / fileDuration) * 100);
+    const newEnd = Math.min(segmentEnd, maxEnd);
+    const newStart = Math.min(value, newEnd - 0.5);
+    setSegmentStart(newStart);
+    setSegmentEnd(newEnd);
+    setSelectedDuration(((newEnd - newStart) / 100) * fileDuration);
+  }
+
+  function handleEndChange(value: number) {
+    const minStart = Math.max(0, value - (MAX_SEGMENT_SECONDS / fileDuration) * 100);
+    const newStart = Math.max(segmentStart, minStart);
+    const newEnd = Math.max(value, newStart + 0.5);
+    setSegmentStart(newStart);
+    setSegmentEnd(newEnd);
+    setSelectedDuration(((newEnd - newStart) / 100) * fileDuration);
+  }
+
+  function resetCrop() {
+    const initialEnd = Math.min(100, (MAX_SEGMENT_SECONDS / fileDuration) * 100);
+    setSegmentStart(0);
+    setSegmentEnd(initialEnd);
+    setSelectedDuration(Math.min(fileDuration, MAX_SEGMENT_SECONDS));
+  }
+
+  async function analyzeSegment() {
+    const data = audioDataRef.current;
+    if (!data) return;
+
+    setError(null);
+    setMatches([]);
+    histRef.current = new Array(12).fill(0);
+    setProgress(0);
+    setStatus("analyzing");
+
+    const sr = sampleRateRef.current;
+    const totalSamples = data.length;
+    const startSample = Math.floor((segmentStart / 100) * totalSamples);
+    const endSample = Math.floor((segmentEnd / 100) * totalSamples);
+    const segmentData = data.slice(startSample, endSample);
+
+    const windowSize = 2048;
+    const hop = 1024;
+    const totalWindows = Math.floor((segmentData.length - windowSize) / hop);
+    let lastYield = performance.now();
+
+    for (let i = 0; i + windowSize < segmentData.length; i += hop) {
+      const slice = segmentData.slice(i, i + windowSize);
+      const freq = autoCorrelate(slice, sr);
+      if (freq > 60 && freq < 1500) {
+        const pc = freqToPitchClass(freq);
+        histRef.current[pc] += 1;
+      }
+      const windowIndex = Math.floor(i / hop);
+      if (performance.now() - lastYield > 100) {
+        setProgress(Math.round((windowIndex / totalWindows) * 100));
+        await yieldToMainThread();
+        lastYield = performance.now();
+      }
+    }
+
+    setHistogram([...histRef.current]);
+    const results = matchKignit(histRef.current);
+    setMatches(results.slice(0, 5));
+    setStatus("done");
+  }
+
+  function backToCrop() {
+    setStatus("cropping");
   }
 
   const maxHist = Math.max(1, ...histogram);
@@ -192,18 +328,20 @@ function Index() {
               </button>
             )}
 
-            <label className="flex-1 cursor-pointer rounded-xl border border-amber-500/30 bg-amber-500/5 px-5 py-4 text-center font-semibold text-amber-200 transition hover:bg-amber-500/10">
-              📁 Upload Audio
-              <input
-                type="file"
-                accept="audio/*"
-                className="hidden"
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) handleFile(f);
-                }}
-              />
-            </label>
+            {status !== "cropping" && (
+              <label className="flex-1 cursor-pointer rounded-xl border border-amber-500/30 bg-amber-500/5 px-5 py-4 text-center font-semibold text-amber-200 transition hover:bg-amber-500/10">
+                📁 Upload Audio
+                <input
+                  type="file"
+                  accept="audio/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) loadFile(f);
+                  }}
+                />
+              </label>
+            )}
           </div>
 
           {error && (
@@ -223,6 +361,75 @@ function Index() {
                   className="h-full rounded-full bg-gradient-to-r from-amber-600 to-amber-400 transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 />
+              </div>
+            </div>
+          )}
+
+          {status === "cropping" && (
+            <div className="mt-6">
+              <div className="mb-2 flex items-center justify-between text-xs text-amber-200/60">
+                <span className="truncate">{fileName}</span>
+                <span>{formatTime(fileDuration)} total</span>
+              </div>
+
+              <canvas
+                ref={canvasRef}
+                className="w-full rounded-lg"
+                height={140}
+                style={{ imageRendering: "crisp-edges" }}
+              />
+
+              <div className="mt-4 space-y-3">
+                <div>
+                  <div className="flex items-center justify-between text-xs text-amber-200/60">
+                    <span>Segment start</span>
+                    <span>{formatTime((segmentStart / 100) * fileDuration)}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    step={0.1}
+                    value={segmentStart}
+                    onChange={(e) => handleStartChange(Number(e.target.value))}
+                    className="mt-1 w-full accent-amber-500"
+                  />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between text-xs text-amber-200/60">
+                    <span>Segment end</span>
+                    <span>{formatTime((segmentEnd / 100) * fileDuration)}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    step={0.1}
+                    value={segmentEnd}
+                    onChange={(e) => handleEndChange(Number(e.target.value))}
+                    className="mt-1 w-full accent-amber-500"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-4 flex items-center justify-between gap-3 rounded-lg bg-amber-500/5 px-3 py-2 text-xs text-amber-200/70">
+                <span>Selected: {formatTime(selectedDuration)}</span>
+                <span>Max segment: {MAX_SEGMENT_SECONDS}s</span>
+              </div>
+
+              <div className="mt-4 flex gap-3">
+                <button
+                  onClick={resetCrop}
+                  className="flex-1 rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm font-semibold text-amber-200 transition hover:bg-amber-500/10"
+                >
+                  Reset
+                </button>
+                <button
+                  onClick={analyzeSegment}
+                  className="flex-1 rounded-xl bg-amber-500 px-4 py-3 text-sm font-semibold text-[#1a0f08] shadow-lg shadow-amber-500/20 transition hover:bg-amber-400"
+                >
+                  🔍 Analyze This Segment
+                </button>
               </div>
             </div>
           )}
@@ -249,9 +456,17 @@ function Index() {
 
         {matches.length > 0 && (
           <section className="mt-8">
-            <h2 className="mb-4 text-xl font-semibold text-amber-300">
-              Detected Kignit
-            </h2>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-amber-300">
+                Detected Kignit
+              </h2>
+              <button
+                onClick={backToCrop}
+                className="rounded-lg border border-amber-500/30 px-3 py-1.5 text-xs font-medium text-amber-200 transition hover:bg-amber-500/10"
+              >
+                ← Adjust segment
+              </button>
+            </div>
             <div className="space-y-3">
               {matches.map((m, idx) => (
                 <div
