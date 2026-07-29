@@ -40,20 +40,17 @@ function TunerPage() {
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
   const smoothCentsRef = useRef(0);
-  const holdTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastValidRef = useRef<{ note: string; octave: number; cents: number; freq: number } | null>(null);
 
   useEffect(() => () => cleanup(), []);
 
   function cleanup() {
     if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
-    if (holdTimeoutRef.current != null) clearTimeout(holdTimeoutRef.current);
     streamRef.current?.getTracks().forEach((t) => t.stop());
     ctxRef.current?.close().catch(() => {});
     ctxRef.current = null;
     streamRef.current = null;
     rafRef.current = null;
-    holdTimeoutRef.current = null;
   }
 
   async function start() {
@@ -71,7 +68,6 @@ function TunerPage() {
       const buf = new Float32Array(analyser.fftSize);
       setActive(true);
 
-      const holdMs = 500;
       let targetCents = 0;
 
       const tick = () => {
@@ -82,22 +78,10 @@ function TunerPage() {
           const result = freqToNote(f);
           lastValidRef.current = result;
           targetCents = result.cents;
-          if (holdTimeoutRef.current != null) {
-            clearTimeout(holdTimeoutRef.current);
-            holdTimeoutRef.current = null;
-          }
           setNote(result.note);
           setOctave(result.octave);
           setCents(result.cents);
           setFreq(Math.round(f * 10) / 10);
-        } else if (lastValidRef.current != null && holdTimeoutRef.current == null) {
-          holdTimeoutRef.current = setTimeout(() => {
-            lastValidRef.current = null;
-            setNote("—");
-            setOctave(0);
-            setCents(0);
-            setFreq(0);
-          }, holdMs);
         }
 
         smoothCentsRef.current += (targetCents - smoothCentsRef.current) * 0.1;
@@ -178,8 +162,8 @@ function TunerPage() {
 
               <div className="w-full max-w-sm">
                 <div className="relative flex h-14 items-center">
-                  <span className="absolute -left-1 z-10 text-lg text-amber-600/60 select-none">&flat;</span>
-                  <span className="absolute -right-1 z-10 text-lg text-amber-600/60 select-none">&sharp;</span>
+                  <span className="absolute -left-1 z-10 text-lg text-amber-600/60 select-none">♭</span>
+                  <span className="absolute -right-1 z-10 text-lg text-amber-600/60 select-none">♯</span>
 
                   <div className="relative mx-5 w-full h-full">
                     <div className="absolute inset-0 flex items-center">
