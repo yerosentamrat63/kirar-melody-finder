@@ -33,11 +33,15 @@ function TunerPage() {
   const [octave, setOctave] = useState(0);
   const [cents, setCents] = useState(0);
   const [freq, setFreq] = useState(0);
+  const [needleAngle, setNeedleAngle] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   const ctxRef = useRef<AudioContext | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
+  const smoothAngleRef = useRef(0);
+  const holdTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastValidRef = useRef<{ note: string; octave: number; cents: number; freq: number } | null>(null);
 
   useEffect(() => () => cleanup(), []);
 
@@ -65,21 +69,37 @@ function TunerPage() {
       const buf = new Float32Array(analyser.fftSize);
       setActive(true);
 
+      const holdMs = 500;
+      let targetAngle = 0;
+
       const tick = () => {
         analyser.getFloatTimeDomainData(buf);
         const f = autoCorrelate(buf, ctx.sampleRate);
+
         if (f > 50 && f < 2000) {
           const result = freqToNote(f);
+          lastValidRef.current = result;
+          targetAngle = (result.cents / 50) * 120;
+          if (holdTimeoutRef.current != null) {
+            clearTimeout(holdTimeoutRef.current);
+            holdTimeoutRef.current = null;
+          }
           setNote(result.note);
           setOctave(result.octave);
           setCents(result.cents);
           setFreq(Math.round(f * 10) / 10);
-        } else {
-          setNote("—");
-          setOctave(0);
-          setCents(0);
-          setFreq(0);
+        } else if (lastValidRef.current != null && holdTimeoutRef.current == null) {
+          holdTimeoutRef.current = setTimeout(() => {
+            lastValidRef.current = null;
+            setNote("—");
+            setOctave(0);
+            setCents(0);
+            setFreq(0);
+          }, holdMs);
         }
+
+        smoothAngleRef.current += (targetAngle - smoothAngleRef.current) * 0.12;
+        setNeedleAngle(smoothAngleRef.current);
         rafRef.current = requestAnimationFrame(tick);
       };
       tick();
@@ -96,9 +116,8 @@ function TunerPage() {
     setFreq(0);
   }
 
-  const centsPct = Math.max(-50, Math.min(50, cents)) / 50;
   const inTune = Math.abs(cents) <= 3;
-  const angle = centsPct * 120;
+  const angle = needleAngle;
 
   const needleColor = inTune ? "#f59e0b" : Math.abs(cents) <= 10 ? "#d97706" : "#92400e";
 
