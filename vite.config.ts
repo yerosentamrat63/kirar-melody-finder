@@ -18,7 +18,7 @@ export default defineConfig({
     plugins: [
       ...VitePWA({
         registerType: "autoUpdate",
-        includeAssets: ["icons/*.svg", "sw.js"],
+        includeAssets: ["icons/*.svg"],
         selfDestroying: true,
         workbox: {
           globPatterns: [],
