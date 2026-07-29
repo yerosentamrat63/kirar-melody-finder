@@ -5,7 +5,6 @@ import {
   freqToPitchClass,
   matchKignit,
   PITCH_NAMES,
-  KIGNITS,
   scaleNotes,
   scaleIntervals,
   type KignitMatch,
@@ -35,12 +34,17 @@ export const Route = createFileRoute("/")({
 
 type Status = "idle" | "recording" | "analyzing" | "done" | "error";
 
+function yieldToMainThread(): Promise<void> {
+  return new Promise((r) => setTimeout(r, 16));
+}
+
 function Index() {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const [histogram, setHistogram] = useState<number[]>(new Array(12).fill(0));
   const [matches, setMatches] = useState<KignitMatch[]>([]);
   const [elapsed, setElapsed] = useState(0);
+  const [progress, setProgress] = useState(0);
 
   const audioCtxRef = useRef<AudioContext | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -110,6 +114,7 @@ function Index() {
   async function handleFile(file: File) {
     setError(null);
     setMatches([]);
+    setProgress(0);
     histRef.current = new Array(12).fill(0);
     setStatus("analyzing");
     try {
@@ -122,12 +127,20 @@ function Index() {
       const sr = audioBuf.sampleRate;
       const windowSize = 2048;
       const hop = 1024;
+      const totalWindows = Math.floor((data.length - windowSize) / hop);
+      let lastYield = performance.now();
       for (let i = 0; i + windowSize < data.length; i += hop) {
         const slice = data.slice(i, i + windowSize);
         const freq = autoCorrelate(slice, sr);
         if (freq > 60 && freq < 1500) {
           const pc = freqToPitchClass(freq);
           histRef.current[pc] += 1;
+        }
+        const windowIndex = Math.floor(i / hop);
+        if (performance.now() - lastYield > 100) {
+          setProgress(Math.round((windowIndex / totalWindows) * 100));
+          await yieldToMainThread();
+          lastYield = performance.now();
         }
       }
       setHistogram([...histRef.current]);
@@ -197,6 +210,21 @@ function Index() {
             <p className="mt-4 rounded-lg bg-red-500/15 px-3 py-2 text-sm text-red-300">
               {error}
             </p>
+          )}
+
+          {status === "analyzing" && progress > 0 && (
+            <div className="mt-6">
+              <div className="mb-1 flex items-center justify-between text-xs text-amber-200/60">
+                <span>Analyzing audio…</span>
+                <span>{progress}%</span>
+              </div>
+              <div className="h-2 overflow-hidden rounded-full bg-amber-500/10">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-amber-600 to-amber-400 transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
           )}
 
           {totalNotes > 0 && (
@@ -282,39 +310,6 @@ function Index() {
             </div>
           </section>
         )}
-
-        <section className="mt-10 rounded-2xl border border-amber-500/15 bg-black/20 p-5 text-sm text-amber-200/70">
-          <h3 className="mb-3 font-semibold text-amber-200">About the ቅኝቶች</h3>
-          <ul className="space-y-3">
-            {KIGNITS.map((k) => (
-              <li key={k.name}>
-                <div>
-                  <span className="text-amber-300">{k.amharic}</span> —{" "}
-                  <span className="text-amber-100">{k.name}</span>: {k.description}
-                </div>
-                <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                  <span className="text-[10px] uppercase tracking-wider text-amber-300/60">
-                    in C:
-                  </span>
-                  {scaleNotes(k, 0).map((n, i) => (
-                    <span
-                      key={i}
-                      className="rounded-md border border-amber-500/20 bg-amber-500/5 px-1.5 py-0.5 font-mono text-[11px] text-amber-100"
-                    >
-                      {n}
-                    </span>
-                  ))}
-                  <span className="ml-1 text-[10px] text-amber-200/50">
-                    ({scaleIntervals(k).join("-")})
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-3 text-xs text-amber-200/50">
-            Best results with a clear kirar or begena melody, minimal background noise, and 10–30 seconds of playback.
-          </p>
-        </section>
       </div>
     </div>
   );

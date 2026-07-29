@@ -76,15 +76,29 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      {
+        name: "viewport",
+        content: "width=device-width, initial-scale=1, viewport-fit=cover",
+      },
+      { title: "ቅኝት Finder — Ethiopian Kignit Detector" },
+      {
+        name: "description",
+        content:
+          "Detect the ቅኝት (kignit) of Ethiopian kirar and begena mezmurs by listening or uploading audio.",
+      },
+      { name: "theme-color", content: "#1a0f08" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "ቅኝት Finder" },
+      { name: "author", content: "Kignit" },
+      { property: "og:title", content: "ቅኝት Finder — Ethiopian Kignit Detector" },
+      {
+        property: "og:description",
+        content:
+          "Identify the Ethiopian modal scale of any kirar or begena mezmur in seconds.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
@@ -92,6 +106,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      {
+        rel: "apple-touch-icon",
+        href: "/icons/icon-192.svg",
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -99,6 +117,29 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   notFoundComponent: NotFoundComponent,
   errorComponent: ErrorComponent,
 });
+
+function Nav() {
+  return (
+    <nav className="flex items-center justify-center gap-1 border-b border-amber-500/10 bg-[#1a0f08]/80 px-4 py-3 backdrop-blur">
+      <Link
+        to="/"
+        className="rounded-lg px-4 py-2 text-sm font-medium text-amber-200/60 transition hover:text-amber-200 aria-[current]:bg-amber-500/10 aria-[current]:text-amber-300"
+        activeProps={{ className: "bg-amber-500/10 text-amber-300" }}
+        inactiveProps={{}}
+      >
+        🎵 Detector
+      </Link>
+      <Link
+        to="/kignits"
+        className="rounded-lg px-4 py-2 text-sm font-medium text-amber-200/60 transition hover:text-amber-200 aria-[current]:bg-amber-500/10 aria-[current]:text-amber-300"
+        activeProps={{ className: "bg-amber-500/10 text-amber-300" }}
+        inactiveProps={{}}
+      >
+        📖 ቅኝቶች Reference
+      </Link>
+    </nav>
+  );
+}
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
@@ -119,6 +160,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <Nav />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>
