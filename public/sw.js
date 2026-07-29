@@ -1,5 +1,5 @@
 const CACHE = "kignit-v1";
-const PRECACHE = ["/", "/kignits", "/history", "/manifest.webmanifest"];
+const PRECACHE = ["/", "/kignits", "/tuner", "/history", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();

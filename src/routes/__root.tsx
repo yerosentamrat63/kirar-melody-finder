@@ -160,8 +160,20 @@ function Nav() {
           <span className="mt-0.5 h-0.5 w-4 rounded-full bg-current opacity-0 transition-opacity duration-200 group-aria-[current]:opacity-100" />
         </Link>
         <Link
+          to="/tuner"
+          className="group flex flex-1 flex-col items-center gap-0.5 px-2 py-2.5 text-[10px] font-sans font-medium uppercase tracking-[0.12em] text-amber-200/40 transition-colors duration-200 hover:text-amber-200/70 aria-[current]:text-amber-400"
+          activeProps={{ className: "text-amber-400" }}
+          inactiveProps={{}}
+        >
+          <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3-8c0 1.66-1.34 3-3 3s-3-1.34-3-3 1.34-3 3-3 3 1.34 3 3z" />
+          </svg>
+          Tuner
+          <span className="mt-0.5 h-0.5 w-4 rounded-full bg-current opacity-0 transition-opacity duration-200 group-aria-[current]:opacity-100" />
+        </Link>
+        <Link
           to="/history"
-          className="group flex flex-1 flex-col items-center gap-0.5 px-3 py-2.5 text-[10px] font-sans font-medium uppercase tracking-[0.12em] text-amber-200/40 transition-colors duration-200 hover:text-amber-200/70 aria-[current]:text-amber-400"
+          className="group flex flex-1 flex-col items-center gap-0.5 px-2 py-2.5 text-[10px] font-sans font-medium uppercase tracking-[0.12em] text-amber-200/40 transition-colors duration-200 hover:text-amber-200/70 aria-[current]:text-amber-400"
           activeProps={{ className: "text-amber-400" }}
           inactiveProps={{}}
         >
