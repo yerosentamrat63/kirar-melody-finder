@@ -14,6 +14,8 @@ interface RangeSliderProps {
 export function RangeSlider({ min, max, step, start, end, maxSeconds, onStartChange, onEndChange }: RangeSliderProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const dragging = useRef<"start" | "end" | null>(null);
+  const lastEvent = useRef<PointerEvent | null>(null);
+  const rafId = useRef<number | null>(null);
 
   const valueFromClient = useCallback(
     (clientX: number) => {
@@ -40,17 +42,30 @@ export function RangeSlider({ min, max, step, start, end, maxSeconds, onStartCha
 
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
-      if (!dragging.current || !trackRef.current) return;
-      const v = valueFromClient(e.clientX);
-      if (dragging.current === "start") onStartChange(v);
-      else onEndChange(v);
+      if (!dragging.current) return;
+      lastEvent.current = e;
+      if (rafId.current != null) return;
+      rafId.current = requestAnimationFrame(() => {
+        rafId.current = null;
+        const ev = lastEvent.current;
+        if (!ev || !dragging.current || !trackRef.current) return;
+        const v = valueFromClient(ev.clientX);
+        if (dragging.current === "start") onStartChange(v);
+        else onEndChange(v);
+      });
     };
-    const onUp = () => { dragging.current = null; };
+    const onUp = () => {
+      dragging.current = null;
+      if (rafId.current != null) cancelAnimationFrame(rafId.current);
+      rafId.current = null;
+      lastEvent.current = null;
+    };
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp);
     return () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
+      if (rafId.current != null) cancelAnimationFrame(rafId.current);
     };
   }, [valueFromClient, onStartChange, onEndChange]);
 
@@ -64,7 +79,7 @@ export function RangeSlider({ min, max, step, start, end, maxSeconds, onStartCha
       </span>
       <div
         ref={trackRef}
-        className="relative h-10 flex-1 cursor-pointer select-none"
+        className="relative h-10 flex-1 cursor-pointer touch-none select-none"
         onPointerDown={onPointer}
       >
         <div className="absolute left-0 right-0 top-1/2 h-2.5 -translate-y-1/2 rounded-full bg-amber-500/15" />
