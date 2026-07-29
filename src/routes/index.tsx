@@ -36,7 +36,7 @@ export const Route = createFileRoute("/")({
 
 type Status = "idle" | "recording" | "loading" | "cropping" | "analyzing" | "done" | "error";
 
-const MAX_SEGMENT_SECONDS = 60;
+const MAX_SEGMENT_SECONDS = 120;
 
 function yieldToMainThread(): Promise<void> {
   return new Promise((r) => setTimeout(r, 16));
@@ -431,6 +431,7 @@ function Index() {
                   step={0.1}
                   start={segmentStart}
                   end={segmentEnd}
+                  maxSeconds={MAX_SEGMENT_SECONDS}
                   onStartChange={handleStartChange}
                   onEndChange={handleEndChange}
                 />

@@ -6,11 +6,12 @@ interface RangeSliderProps {
   step: number;
   start: number;
   end: number;
+  maxSeconds?: number;
   onStartChange: (v: number) => void;
   onEndChange: (v: number) => void;
 }
 
-export function RangeSlider({ min, max, step, start, end, onStartChange, onEndChange }: RangeSliderProps) {
+export function RangeSlider({ min, max, step, start, end, maxSeconds, onStartChange, onEndChange }: RangeSliderProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const dragging = useRef<"start" | "end" | null>(null);
 
@@ -59,7 +60,7 @@ export function RangeSlider({ min, max, step, start, end, onStartChange, onEndCh
   return (
     <div className="flex items-center gap-3">
       <span className="w-10 text-right text-[11px] font-mono text-amber-200/60">
-        {(start / 100 * 60).toFixed(1)}s
+        {(start / 100 * (maxSeconds ?? 60)).toFixed(1)}s
       </span>
       <div
         ref={trackRef}
@@ -91,7 +92,7 @@ export function RangeSlider({ min, max, step, start, end, onStartChange, onEndCh
         </div>
       </div>
       <span className="w-10 text-left text-[11px] font-mono text-amber-200/60">
-        {(end / 100 * 60).toFixed(1)}s
+        {(end / 100 * (maxSeconds ?? 60)).toFixed(1)}s
       </span>
     </div>
   );
