@@ -10,6 +10,7 @@ import {
   type KignitMatch,
 } from "@/lib/pitch";
 import { RangeSlider } from "@/components/RangeSlider";
+import { saveEntry } from "@/lib/history";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -182,6 +183,13 @@ function Index() {
     const results = matchKignit(histRef.current);
     setMatches(results.slice(0, 5));
     setStatus("done");
+    saveEntry({
+      method: "mic",
+      duration: elapsed,
+      matches: results.slice(0, 5),
+      histogram: [...histRef.current],
+      totalNotes: histRef.current.reduce((s, v) => s + v, 0),
+    });
   }
 
   async function loadFile(file: File) {
@@ -301,6 +309,14 @@ function Index() {
     const results = matchKignit(histRef.current);
     setMatches(results.slice(0, 5));
     setStatus("done");
+    saveEntry({
+      method: "file",
+      fileName,
+      duration: fileDuration,
+      matches: results.slice(0, 5),
+      histogram: [...histRef.current],
+      totalNotes: histRef.current.reduce((s, v) => s + v, 0),
+    });
   }
 
   function backToCrop() {

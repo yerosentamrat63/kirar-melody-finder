@@ -153,6 +153,15 @@ function Nav() {
           ቅኝቶች Reference
           <span className="absolute bottom-0 left-0 right-0 h-px bg-amber-500 opacity-0 transition-opacity duration-200 aria-[current]:opacity-100" />
         </Link>
+        <Link
+          to="/history"
+          className="relative px-1 py-3.5 text-sm font-medium font-sans tracking-wide text-amber-200/50 transition-colors duration-200 hover:text-amber-200 aria-[current]:text-amber-300"
+          activeProps={{ className: "text-amber-300" }}
+          inactiveProps={{}}
+        >
+          History
+          <span className="absolute bottom-0 left-0 right-0 h-px bg-amber-500 opacity-0 transition-opacity duration-200 aria-[current]:opacity-100" />
+        </Link>
       </div>
     </nav>
   );
