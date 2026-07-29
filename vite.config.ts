@@ -17,11 +17,11 @@ export default defineConfig({
   vite: {
     plugins: [
       ...VitePWA({
-        registerType: "autoUpdate",
-        includeAssets: ["icons/*.svg"],
-        selfDestroying: true,
-        workbox: {
-          globPatterns: [],
+        strategies: "injectManifest",
+        swSrc: "public/sw.js",
+        swDest: "sw.js",
+        injectManifest: {
+          injectionPoint: undefined,
         },
         manifest: {
           name: "ቅኝት Finder — Ethiopian Kignit Detector",
