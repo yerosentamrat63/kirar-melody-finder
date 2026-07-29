@@ -327,7 +327,7 @@ function Index() {
   const totalNotes = histogram.reduce((s, v) => s + v, 0);
 
   return (
-    <div className="parchment-bg min-h-screen font-sans text-text-primary">
+    <div className="parchment-bg min-h-screen pb-20 font-sans text-text-primary">
       <div className="mx-auto max-w-3xl px-5 py-10 sm:py-16">
         <header className="mb-12 text-center">
           <div className="mb-4 inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-amber-500/60">
