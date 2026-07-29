@@ -464,6 +464,11 @@ function Index() {
               <p className="mb-3 text-[10px] font-sans uppercase tracking-[0.15em] text-amber-500/50">
                 Pitch distribution &middot; {totalNotes} notes
               </p>
+              {totalNotes < 600 && (
+                <p className="mb-3 text-[11px] leading-relaxed text-amber-500/60">
+                  For a reliable detection aim for <span className="text-amber-400/80">900–1000+</span> detected tones — record or select a longer segment.
+                </p>
+              )}
               <div className="flex h-32 items-end gap-[3px]">
                 {histogram.map((v, i) => (
                   <div key={i} className="flex flex-1 flex-col items-center gap-1">
