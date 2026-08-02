@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { autoCorrelate, PITCH_NAMES } from "@/lib/pitch";
+import { yinDetect, PITCH_NAMES } from "@/lib/pitch";
 
 export const Route = createFileRoute("/tuner")({
   head: () => ({
@@ -40,7 +40,8 @@ function TunerPage() {
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
   const smoothCentsRef = useRef(0);
-  const lastValidRef = useRef<{ note: string; octave: number; cents: number; freq: number } | null>(null);
+  const displayedNoteRef = useRef("");
+  const candidateRef = useRef<{ note: string; count: number }>({ note: "", count: 0 });
 
   useEffect(() => () => cleanup(), []);
 
@@ -72,16 +73,29 @@ function TunerPage() {
 
       const tick = () => {
         analyser.getFloatTimeDomainData(buf);
-        const f = autoCorrelate(buf, ctx.sampleRate);
+        const detection = yinDetect(buf, ctx.sampleRate, 55, 0.1);
 
-        if (f > 50 && f < 2000) {
-          const result = freqToNote(f);
-          lastValidRef.current = result;
+        if (detection && detection.freq > 50 && detection.freq < 2000) {
+          const result = freqToNote(detection.freq);
           targetCents = result.cents;
-          setNote(result.note);
-          setOctave(result.octave);
+
+          if (result.note !== displayedNoteRef.current) {
+            if (candidateRef.current.note === result.note) {
+              candidateRef.current.count += 1;
+            } else {
+              candidateRef.current = { note: result.note, count: 1 };
+            }
+            if (candidateRef.current.count >= 4) {
+              displayedNoteRef.current = result.note;
+              setNote(result.note);
+              setOctave(result.octave);
+            }
+          } else {
+            candidateRef.current = { note: result.note, count: 0 };
+          }
+
           setCents(result.cents);
-          setFreq(Math.round(f * 10) / 10);
+          setFreq(Math.round(detection.freq * 10) / 10);
         }
 
         smoothCentsRef.current += (targetCents - smoothCentsRef.current) * 0.1;
@@ -100,6 +114,8 @@ function TunerPage() {
     setNote("—");
     setCents(0);
     setFreq(0);
+    displayedNoteRef.current = "";
+    candidateRef.current = { note: "", count: 0 };
   }
 
   const inTune = Math.abs(cents) <= 3;

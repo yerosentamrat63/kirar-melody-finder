@@ -1,38 +1,71 @@
-// Pitch detection (autocorrelation) + pitch-class histogram + Kignit matcher.
+// Pitch detection (YIN) + pitch-class histogram + Kignit matcher.
 
-export function autoCorrelate(buf: Float32Array, sampleRate: number): number {
+// YIN algorithm — robust monophonic pitch detection (de Cheveigné & Kawahara).
+// Returns the detected frequency and a "clarity" value (0 = periodic/clean,
+// 1 = no clear period). Returns null when the frame is silence or noise.
+export function yinDetect(
+  buf: Float32Array,
+  sampleRate: number,
+  minFreq = 40,
+  threshold = 0.1
+): { freq: number; clarity: number } | null {
   const SIZE = buf.length;
-  let rms = 0;
-  for (let i = 0; i < SIZE; i++) rms += buf[i] * buf[i];
-  rms = Math.sqrt(rms / SIZE);
-  if (rms < 0.01) return -1;
+  let maxLag = Math.min(SIZE - 2, Math.floor(sampleRate / minFreq));
+  if (maxLag < 2) return null;
+  // Keep at least one full period inside the window for reliable detection.
+  maxLag = Math.min(maxLag, Math.floor(SIZE / 2));
+  if (maxLag < 2) return null;
 
-  let r1 = 0;
-  let r2 = SIZE - 1;
-  const thres = 0.2;
-  for (let i = 0; i < SIZE / 2; i++) if (Math.abs(buf[i]) < thres) { r1 = i; break; }
-  for (let i = 1; i < SIZE / 2; i++) if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; }
-
-  const trimmed = buf.slice(r1, r2);
-  const size = trimmed.length;
-  const c = new Array(size).fill(0);
-  for (let i = 0; i < size; i++)
-    for (let j = 0; j < size - i; j++) c[i] += trimmed[j] * trimmed[j + i];
-
-  let d = 0;
-  while (c[d] > c[d + 1]) d++;
-  let maxval = -1;
-  let maxpos = -1;
-  for (let i = d; i < size; i++) {
-    if (c[i] > maxval) { maxval = c[i]; maxpos = i; }
+  const windowLen = SIZE - maxLag;
+  const d = new Float32Array(maxLag + 1);
+  for (let tau = 1; tau <= maxLag; tau++) {
+    let sum = 0;
+    for (let i = 0; i < windowLen; i++) {
+      const diff = buf[i] - buf[i + tau];
+      sum += diff * diff;
+    }
+    d[tau] = sum / windowLen;
   }
-  let T0 = maxpos;
-  if (T0 <= 0) return -1;
-  const x1 = c[T0 - 1] ?? 0, x2 = c[T0] ?? 0, x3 = c[T0 + 1] ?? 0;
-  const a = (x1 + x3 - 2 * x2) / 2;
-  const b = (x3 - x1) / 2;
-  if (a) T0 = T0 - b / (2 * a);
-  return sampleRate / T0;
+
+  // Cumulative mean normalized difference
+  const dNorm = new Float32Array(maxLag + 1);
+  dNorm[0] = 1;
+  let runningSum = 0;
+  for (let tau = 1; tau <= maxLag; tau++) {
+    runningSum += d[tau];
+    dNorm[tau] = runningSum === 0 ? 1 : (d[tau] * tau) / runningSum;
+  }
+
+  // Absolute threshold, stepping down to the local minimum
+  let tau = -1;
+  for (let t = 2; t <= maxLag; t++) {
+    if (dNorm[t] < threshold) {
+      while (t + 1 <= maxLag && dNorm[t + 1] < dNorm[t]) t++;
+      tau = t;
+      break;
+    }
+  }
+  if (tau === -1) return null;
+  const clarity = dNorm[tau];
+
+  // Parabolic interpolation for sub-sample precision
+  let betterTau = tau;
+  const x0 = dNorm[tau - 1];
+  const x1 = dNorm[tau];
+  const x2 = dNorm[tau + 1];
+  const denom = x0 - 2 * x1 + x2;
+  if (denom !== 0) {
+    const delta = 0.5 * (x0 - x2) / denom;
+    if (Math.abs(delta) < 1) betterTau = tau + delta;
+  }
+
+  return { freq: sampleRate / betterTau, clarity };
+}
+
+// Backwards-compatible wrapper for callers that only need the frequency.
+export function autoCorrelate(buf: Float32Array, sampleRate: number): number {
+  const result = yinDetect(buf, sampleRate);
+  return result ? result.freq : -1;
 }
 
 export function freqToPitchClass(freq: number): number {
