@@ -124,7 +124,11 @@ function HistoryPage() {
                           {entry.matches[0]?.kignit.amharic ?? ""}
                         </span>
                         <span className="hidden shrink-0 text-xs text-text-muted sm:inline">
-                          {entry.method === "mic" ? "mic" : entry.fileName ?? "file"}
+                          {entry.method === "mic"
+                            ? "mic"
+                            : entry.method === "youtube"
+                              ? "youtube"
+                              : (entry.fileName ?? "file")}
                         </span>
                       </span>
                     </div>
@@ -141,7 +145,14 @@ function HistoryPage() {
                   {expanded === entry.id && (
                     <div className="border-t border-emerald-500/10 px-4 py-4">
                       <div className="mb-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-text-muted">
-                        <span>Method: {entry.method === "mic" ? "Microphone" : "File upload"}</span>
+                        <span>
+                          Method:{" "}
+                          {entry.method === "mic"
+                            ? "Microphone"
+                            : entry.method === "youtube"
+                              ? "YouTube"
+                              : "File upload"}
+                        </span>
                         {entry.name && <span>Name: {entry.name}</span>}
                         {entry.fileName && <span>File: {entry.fileName}</span>}
                         {entry.duration && <span>Duration: {formatDuration(entry.duration)}</span>}

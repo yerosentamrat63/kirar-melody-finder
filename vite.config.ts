@@ -8,7 +8,15 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
-  nitro: { preset: "vercel" },
+  nitro: {
+    preset: "vercel",
+    ...({
+      // YouTube audio streaming runs inside the same serverless function, which
+      // needs more than the 10s default to proxy a full mezmur. Fluid Compute
+      // allows up to 300s on Hobby.
+      vercel: { functions: { maxDuration: 300 } },
+    } as object),
+  },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
@@ -28,8 +36,8 @@ export default defineConfig({
           short_name: "ቅኝት Finder",
           description:
             "Detect the ቅኝት (kignit) of Ethiopian kirar and begena mezmurs by listening or uploading audio.",
-          theme_color: "#1a0f08",
-          background_color: "#1a0f08",
+          theme_color: "#06130e",
+          background_color: "#06130e",
           display: "standalone",
           orientation: "portrait",
           start_url: "/",

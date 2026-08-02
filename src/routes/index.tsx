@@ -110,6 +110,16 @@ function Index() {
   const [fileDuration, setFileDuration] = useState(0);
   const [selectedDuration, setSelectedDuration] = useState(0);
 
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [youtubeInfo, setYoutubeInfo] = useState<{
+    id: string;
+    title: string;
+    author: string;
+    duration: number;
+  } | null>(null);
+  const [youtubeBusy, setYoutubeBusy] = useState(false);
+  const [youtubeProgress, setYoutubeProgress] = useState(0);
+
   const [pendingEntry, setPendingEntry] = useState<
     Omit<HistoryEntry, "id" | "timestamp" | "name"> | null
   >(null);
@@ -124,6 +134,7 @@ function Index() {
   const audioDataRef = useRef<Float32Array | null>(null);
   const sampleRateRef = useRef<number>(0);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const sourceRef = useRef<"file" | "youtube">("file");
 
   useEffect(() => () => cleanup(), []);
 
@@ -208,6 +219,7 @@ function Index() {
     setPendingEntry(null);
     setSavedFlash(false);
     setFileName(file.name);
+    sourceRef.current = "file";
     setStatus("loading");
     try {
       const AC =
@@ -237,6 +249,108 @@ function Index() {
       });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not decode audio");
+      setStatus("error");
+    }
+  }
+
+  async function handleFetchYoutube() {
+    const url = youtubeUrl.trim();
+    if (!url || youtubeBusy) return;
+    setError(null);
+    setYoutubeInfo(null);
+    setYoutubeBusy(true);
+    try {
+      const res = await fetch(`/api/youtube/info?url=${encodeURIComponent(url)}`);
+      const data = await res.json();
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.error ?? "Could not fetch the YouTube video.");
+      }
+      setYoutubeInfo({
+        id: data.id,
+        title: data.title,
+        author: data.author,
+        duration: data.duration,
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not fetch the YouTube video.");
+    } finally {
+      setYoutubeBusy(false);
+    }
+  }
+
+  async function fetchYoutubeStream(videoId: string): Promise<ArrayBuffer> {
+    const res = await fetch(`/api/youtube/stream?v=${encodeURIComponent(videoId)}`);
+    if (!res.ok) {
+      let msg = `Could not load the audio (HTTP ${res.status}).`;
+      try {
+        const j = await res.json();
+        if (j?.error) msg = j.error;
+      } catch {
+        /* ignore */
+      }
+      throw new Error(msg);
+    }
+    const total = Number(res.headers.get("content-length") ?? 0);
+    if (!res.body) return res.arrayBuffer();
+    const reader = res.body.getReader();
+    const chunks: Uint8Array[] = [];
+    let received = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value) {
+        chunks.push(value);
+        received += value.byteLength;
+        if (total > 0) setYoutubeProgress(Math.round((received / total) * 100));
+      }
+    }
+    const merged = new Uint8Array(received);
+    let offset = 0;
+    for (const c of chunks) {
+      merged.set(c, offset);
+      offset += c.byteLength;
+    }
+    return merged.buffer as ArrayBuffer;
+  }
+
+  async function loadYoutubeAudio() {
+    if (!youtubeInfo || status === "loading") return;
+    setError(null);
+    setMatches([]);
+    setPendingEntry(null);
+    setSavedFlash(false);
+    setStatus("loading");
+    setYoutubeProgress(0);
+    try {
+      const arrayBuf = await fetchYoutubeStream(youtubeInfo.id);
+      const AC =
+        window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const ctx = new AC();
+      const audioBuf = await ctx.decodeAudioData(arrayBuf);
+      ctx.close().catch(() => {});
+
+      const data = audioBuf.getChannelData(0);
+      const sr = audioBuf.sampleRate;
+      const duration = data.length / sr;
+      audioDataRef.current = data;
+      sampleRateRef.current = sr;
+      setFileDuration(duration);
+      setFileName(youtubeInfo.title || "YouTube mezmur");
+      sourceRef.current = "youtube";
+
+      const initialEnd = Math.min(100, (MAX_SEGMENT_SECONDS / duration) * 100);
+      setSegmentStart(0);
+      setSegmentEnd(initialEnd);
+      setSelectedDuration(Math.min(duration, MAX_SEGMENT_SECONDS));
+      setStatus("cropping");
+
+      requestAnimationFrame(() => {
+        if (canvasRef.current) {
+          drawWaveform(canvasRef.current, data, sr, 0, initialEnd);
+        }
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not load YouTube audio");
       setStatus("error");
     }
   }
@@ -322,7 +436,7 @@ function Index() {
     setMatches(results.slice(0, 5));
     setStatus("done");
     setPendingEntry({
-      method: "file",
+      method: sourceRef.current,
       fileName,
       duration: selectedDuration,
       matches: results.slice(0, 5),
@@ -406,6 +520,53 @@ function Index() {
             )}
           </div>
 
+          {status !== "cropping" && status !== "loading" && status !== "recording" && (
+            <div className="mt-4 border-t border-emerald-500/10 pt-4">
+              <p className="mb-2 text-[10px] font-sans uppercase tracking-[0.15em] text-emerald-500/50">
+                From YouTube
+              </p>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <input
+                  type="url"
+                  value={youtubeUrl}
+                  onChange={(e) => setYoutubeUrl(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleFetchYoutube();
+                  }}
+                  placeholder="Paste a YouTube link…"
+                  className="min-w-0 flex-1 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2.5 text-sm text-text-primary outline-none transition placeholder:text-text-muted/60 focus:border-emerald-500/50"
+                />
+                <button
+                  onClick={handleFetchYoutube}
+                  disabled={youtubeBusy || !youtubeUrl.trim()}
+                  className="btn-outline shrink-0 rounded-lg px-5 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {youtubeBusy ? "Fetching…" : "Fetch Video"}
+                </button>
+              </div>
+              <p className="mt-2 text-[11px] leading-relaxed text-text-muted">
+                Max 15 minutes. Private, age-restricted, or region-locked videos may not load.
+              </p>
+
+              {youtubeInfo && (
+                <div className="mt-4 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-4">
+                  <p className="text-sm font-medium leading-snug text-text-primary">
+                    {youtubeInfo.title}
+                  </p>
+                  <p className="mt-1 text-xs text-text-muted">
+                    {youtubeInfo.author || "Unknown channel"} · {formatTime(youtubeInfo.duration)}
+                  </p>
+                  <button
+                    onClick={loadYoutubeAudio}
+                    className="btn-gold mt-3 rounded-lg px-4 py-2 text-xs tracking-wide"
+                  >
+                    Load Mezmur Audio
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           {error && (
             <p className="mt-4 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">
               {error}
@@ -414,10 +575,22 @@ function Index() {
 
           {status === "loading" && (
             <div className="mt-6">
-              <div className="flex items-center justify-center gap-3 py-8">
+              <div className="flex items-center justify-center gap-3 py-6">
                 <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-emerald-500/30 border-t-emerald-400" />
-                <span className="text-sm font-sans tracking-wide text-text-secondary">Decoding audio</span>
+                <span className="text-sm font-sans tracking-wide text-text-secondary">
+                  {youtubeProgress > 0
+                    ? `Loading YouTube audio — ${youtubeProgress}%`
+                    : "Loading audio…"}
+                </span>
               </div>
+              {youtubeProgress > 0 && (
+                <div className="h-1.5 overflow-hidden rounded-full bg-emerald-500/10">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400 transition-all duration-200"
+                    style={{ width: `${youtubeProgress}%` }}
+                  />
+                </div>
+              )}
             </div>
           )}
 
@@ -541,7 +714,8 @@ function Index() {
                     value={entryName}
                     onChange={(e) => setEntryName(e.target.value)}
                     placeholder={
-                      pendingEntry.method === "file" && pendingEntry.fileName
+                      (pendingEntry.method === "file" || pendingEntry.method === "youtube") &&
+                      pendingEntry.fileName
                         ? pendingEntry.fileName
                         : "Mezmur name (optional)"
                     }
