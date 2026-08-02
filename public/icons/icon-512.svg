@@ -1,18 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#2a1810"/>
-      <stop offset="100%" stop-color="#1a0f08"/>
+      <stop offset="0%" stop-color="#0d241b"/>
+      <stop offset="100%" stop-color="#06130e"/>
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="80" fill="url(#bg)"/>
   <g transform="translate(256,256)">
     <!-- Double eighth note -->
-    <ellipse cx="-40" cy="45" rx="42" ry="30" fill="#fbbf24" transform="rotate(-20,-40,45)"/>
-    <ellipse cx="55" cy="40" rx="42" ry="30" fill="#fbbf24" transform="rotate(-20,55,40)"/>
-    <rect x="5" y="-130" width="14" height="175" rx="7" fill="#fbbf24"/>
-    <rect x="55" y="-135" width="14" height="175" rx="7" fill="#fbbf24"/>
-    <path d="M19,-130 Q80,-115 95,-80 Q100,-55 90,-30" stroke="#f59e0b" stroke-width="8" fill="none" stroke-linecap="round"/>
-    <path d="M69,-135 Q130,-120 145,-85 Q150,-60 140,-35" stroke="#f59e0b" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <ellipse cx="-40" cy="45" rx="42" ry="30" fill="#34d399" transform="rotate(-20,-40,45)"/>
+    <ellipse cx="55" cy="40" rx="42" ry="30" fill="#34d399" transform="rotate(-20,55,40)"/>
+    <rect x="5" y="-130" width="14" height="175" rx="7" fill="#34d399"/>
+    <rect x="55" y="-135" width="14" height="175" rx="7" fill="#34d399"/>
+    <path d="M19,-130 Q80,-115 95,-80 Q100,-55 90,-30" stroke="#10b981" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <path d="M69,-135 Q130,-120 145,-85 Q150,-60 140,-35" stroke="#10b981" stroke-width="8" fill="none" stroke-linecap="round"/>
   </g>
 </svg>

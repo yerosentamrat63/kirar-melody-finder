@@ -10,11 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HistoryRouteImport } from './routes/history'
 import { Route as KignitsRouteImport } from './routes/kignits'
+import { Route as TunerRouteImport } from './routes/tuner'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HistoryRoute = HistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KignitsRoute = KignitsRouteImport.update({
@@ -22,31 +29,44 @@ const KignitsRoute = KignitsRouteImport.update({
   path: '/kignits',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TunerRoute = TunerRouteImport.update({
+  id: '/tuner',
+  path: '/tuner',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/history': typeof HistoryRoute
   '/kignits': typeof KignitsRoute
+  '/tuner': typeof TunerRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/history': typeof HistoryRoute
   '/kignits': typeof KignitsRoute
+  '/tuner': typeof TunerRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/history': typeof HistoryRoute
   '/kignits': typeof KignitsRoute
+  '/tuner': typeof TunerRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/kignits'
+  fullPaths: '/' | '/history' | '/kignits' | '/tuner'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/kignits'
-  id: '__root__' | '/' | '/kignits'
+  to: '/' | '/history' | '/kignits' | '/tuner'
+  id: '__root__' | '/' | '/history' | '/kignits' | '/tuner'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  HistoryRoute: typeof HistoryRoute
   KignitsRoute: typeof KignitsRoute
+  TunerRoute: typeof TunerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,6 +78,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/history': {
+      id: '/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof HistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/kignits': {
       id: '/kignits'
       path: '/kignits'
@@ -65,12 +92,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KignitsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tuner': {
+      id: '/tuner'
+      path: '/tuner'
+      fullPath: '/tuner'
+      preLoaderRoute: typeof TunerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  HistoryRoute: HistoryRoute,
   KignitsRoute: KignitsRoute,
+  TunerRoute: TunerRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

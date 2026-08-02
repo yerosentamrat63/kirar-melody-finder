@@ -74,7 +74,7 @@ export function RangeSlider({ min, max, step, start, end, maxSeconds, onStartCha
 
   return (
     <div className="flex items-center gap-3">
-      <span className="w-10 text-right text-[11px] font-mono text-amber-200/60">
+      <span className="w-10 text-right text-[11px] font-mono text-emerald-200/60">
         {(start / 100 * (maxSeconds ?? 60)).toFixed(1)}s
       </span>
       <div
@@ -82,14 +82,14 @@ export function RangeSlider({ min, max, step, start, end, maxSeconds, onStartCha
         className="relative h-10 flex-1 cursor-pointer touch-none select-none"
         onPointerDown={onPointer}
       >
-        <div className="absolute left-0 right-0 top-1/2 h-2.5 -translate-y-1/2 rounded-full bg-amber-500/15" />
+        <div className="absolute left-0 right-0 top-1/2 h-2.5 -translate-y-1/2 rounded-full bg-emerald-500/15" />
         <div
-          className="absolute top-1/2 h-2.5 -translate-y-1/2 rounded-full bg-amber-500/40"
+          className="absolute top-1/2 h-2.5 -translate-y-1/2 rounded-full bg-emerald-500/40"
           style={{ left: `${startPct}%`, right: `${100 - endPct}%` }}
         />
         <div
           data-thumb="start"
-          className="absolute top-1/2 z-10 h-9 w-5 -translate-x-1/2 -translate-y-1/2 cursor-grab rounded-[5px] border-2 border-amber-400 bg-amber-50 shadow-md active:cursor-grabbing"
+          className="absolute top-1/2 z-10 h-9 w-5 -translate-x-1/2 -translate-y-1/2 cursor-grab rounded-[5px] border-2 border-emerald-400 bg-emerald-50 shadow-md active:cursor-grabbing"
           style={{ left: `${startPct}%` }}
         >
           <svg viewBox="0 0 18 24" className="h-full w-full fill-[#333]">
@@ -98,7 +98,7 @@ export function RangeSlider({ min, max, step, start, end, maxSeconds, onStartCha
         </div>
         <div
           data-thumb="end"
-          className="absolute top-1/2 z-10 h-9 w-5 -translate-x-1/2 -translate-y-1/2 cursor-grab rounded-[5px] border-2 border-amber-400 bg-amber-50 shadow-md active:cursor-grabbing"
+          className="absolute top-1/2 z-10 h-9 w-5 -translate-x-1/2 -translate-y-1/2 cursor-grab rounded-[5px] border-2 border-emerald-400 bg-emerald-50 shadow-md active:cursor-grabbing"
           style={{ left: `${endPct}%` }}
         >
           <svg viewBox="0 0 18 24" className="h-full w-full fill-[#333]">
@@ -106,7 +106,7 @@ export function RangeSlider({ min, max, step, start, end, maxSeconds, onStartCha
           </svg>
         </div>
       </div>
-      <span className="w-10 text-left text-[11px] font-mono text-amber-200/60">
+      <span className="w-10 text-left text-[11px] font-mono text-emerald-200/60">
         {(end / 100 * (maxSeconds ?? 60)).toFixed(1)}s
       </span>
     </div>

@@ -76,16 +76,16 @@ function drawWaveform(
     ctx.moveTo(x, mid - barH);
     ctx.lineTo(x, mid + barH);
   }
-  ctx.strokeStyle = "rgba(251, 191, 36, 0.4)";
+  ctx.strokeStyle = "rgba(52, 211, 153, 0.4)";
   ctx.lineWidth = 1;
   ctx.stroke();
 
   const sx = (startPct / 100) * w;
   const ex = (endPct / 100) * w;
-  ctx.fillStyle = "rgba(251, 191, 36, 0.12)";
+  ctx.fillStyle = "rgba(52, 211, 153, 0.12)";
   ctx.fillRect(sx, 0, ex - sx, h);
 
-  ctx.fillStyle = "rgba(251, 191, 36, 0.5)";
+  ctx.fillStyle = "rgba(52, 211, 153, 0.5)";
   ctx.fillRect(sx, 0, 2, h);
   ctx.fillRect(ex - 2, 0, 2, h);
 }
@@ -356,10 +356,10 @@ function Index() {
     <div className="parchment-bg min-h-screen pb-20 font-sans text-text-primary">
       <div className="mx-auto max-w-3xl px-5 py-10 sm:py-16">
         <header className="mb-12 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-amber-500/60">
-            <span className="inline-block h-px w-6 bg-amber-500/30" />
+          <div className="mb-4 inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-emerald-500/60">
+            <span className="inline-block h-px w-6 bg-emerald-500/30" />
             ክራር · በገና · ቅኝት
-            <span className="inline-block h-px w-6 bg-amber-500/30" />
+            <span className="inline-block h-px w-6 bg-emerald-500/30" />
           </div>
           <h1 className="font-serif text-4xl font-bold tracking-tight sm:text-5xl">
             ቅኝት{" "}
@@ -415,7 +415,7 @@ function Index() {
           {status === "loading" && (
             <div className="mt-6">
               <div className="flex items-center justify-center gap-3 py-8">
-                <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-amber-500/30 border-t-amber-400" />
+                <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-emerald-500/30 border-t-emerald-400" />
                 <span className="text-sm font-sans tracking-wide text-text-secondary">Decoding audio</span>
               </div>
             </div>
@@ -427,9 +427,9 @@ function Index() {
                 <span>Analyzing segment</span>
                 <span>{progress}%</span>
               </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-amber-500/10">
+              <div className="h-1.5 overflow-hidden rounded-full bg-emerald-500/10">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-amber-600 to-amber-400 transition-all duration-300"
+                  className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400 transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -438,7 +438,7 @@ function Index() {
 
           {status === "cropping" && (
             <div className="mt-6">
-              <div className="mb-3 flex items-center justify-between border-b border-amber-500/10 pb-2 text-xs font-sans tracking-wide text-text-muted">
+              <div className="mb-3 flex items-center justify-between border-b border-emerald-500/10 pb-2 text-xs font-sans tracking-wide text-text-muted">
                 <span className="truncate">{fileName}</span>
                 <span>{formatTime(fileDuration)} total</span>
               </div>
@@ -463,7 +463,7 @@ function Index() {
                 />
               </div>
 
-              <div className="mt-4 flex items-center justify-between rounded-lg border border-amber-500/10 bg-amber-500/5 px-3 py-2 text-xs tracking-wide text-text-secondary">
+              <div className="mt-4 flex items-center justify-between rounded-lg border border-emerald-500/10 bg-emerald-500/5 px-3 py-2 text-xs tracking-wide text-text-secondary">
                 <span>Selected: {formatTime(selectedDuration)}</span>
                 <span>Max: {MAX_SEGMENT_SECONDS}s</span>
               </div>
@@ -487,19 +487,19 @@ function Index() {
 
           {totalNotes > 0 && (
             <div className="mt-7">
-              <p className="mb-3 text-[10px] font-sans uppercase tracking-[0.15em] text-amber-500/50">
+              <p className="mb-3 text-[10px] font-sans uppercase tracking-[0.15em] text-emerald-500/50">
                 Pitch distribution &middot; {totalNotes} notes
               </p>
               {totalNotes < 600 && (
-                <p className="mb-3 text-[11px] leading-relaxed text-amber-500/60">
-                  For a reliable detection aim for <span className="text-amber-400/80">900–1000+</span> detected tones — record or select a longer segment.
+                <p className="mb-3 text-[11px] leading-relaxed text-emerald-500/60">
+                  For a reliable detection aim for <span className="text-emerald-400/80">900–1000+</span> detected tones — record or select a longer segment.
                 </p>
               )}
               <div className="flex h-32 items-end gap-[3px]">
                 {histogram.map((v, i) => (
                   <div key={i} className="flex flex-1 flex-col items-center gap-1">
                     <div
-                      className="w-full rounded-t bg-gradient-to-t from-amber-700 to-amber-400 transition-all duration-300"
+                      className="w-full rounded-t bg-gradient-to-t from-emerald-700 to-emerald-400 transition-all duration-300"
                       style={{ height: `${(v / maxHist) * 100}%`, minHeight: v > 0 ? 2 : 0 }}
                     />
                     <span className="font-mono text-[10px] text-text-muted">{PITCH_NAMES[i]}</span>
@@ -512,8 +512,8 @@ function Index() {
 
         {matches.length > 0 && (
           <section className="mt-10">
-            <div className="mb-5 flex items-center justify-between border-b border-amber-500/10 pb-3">
-              <h2 className="font-serif text-xl font-semibold tracking-tight text-amber-300">
+            <div className="mb-5 flex items-center justify-between border-b border-emerald-500/10 pb-3">
+              <h2 className="font-serif text-xl font-semibold tracking-tight text-emerald-300">
                 Detected Kignit
               </h2>
               <button
@@ -525,8 +525,8 @@ function Index() {
             </div>
 
             {pendingEntry ? (
-              <div className="mb-4 rounded-lg border border-amber-500/25 bg-amber-500/8 p-4">
-                <p className="mb-2 text-[10px] font-sans uppercase tracking-[0.15em] text-amber-500/50">
+              <div className="mb-4 rounded-lg border border-emerald-500/25 bg-emerald-500/8 p-4">
+                <p className="mb-2 text-[10px] font-sans uppercase tracking-[0.15em] text-emerald-500/50">
                   Save to history
                 </p>
                 {pendingEntry.totalNotes === 0 && (
@@ -545,7 +545,7 @@ function Index() {
                         ? pendingEntry.fileName
                         : "Mezmur name (optional)"
                     }
-                    className="min-w-0 flex-1 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2.5 text-sm text-text-primary outline-none transition placeholder:text-text-muted/60 focus:border-amber-500/50"
+                    className="min-w-0 flex-1 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2.5 text-sm text-text-primary outline-none transition placeholder:text-text-muted/60 focus:border-emerald-500/50"
                   />
                   <button
                     onClick={handleSaveEntry}
@@ -555,13 +555,13 @@ function Index() {
                   </button>
                 </div>
                 {pendingEntry.totalNotes > 0 && pendingEntry.totalNotes < 600 && (
-                  <p className="mt-2 text-[11px] text-amber-500/60">
+                  <p className="mt-2 text-[11px] text-emerald-500/60">
                     Tip: aim for 900–1000+ detected notes for the most reliable kignit.
                   </p>
                 )}
               </div>
             ) : savedFlash ? (
-              <p className="mb-4 rounded-lg border border-amber-500/25 bg-amber-500/8 px-4 py-3 text-center text-xs tracking-wide text-amber-400">
+              <p className="mb-4 rounded-lg border border-emerald-500/25 bg-emerald-500/8 px-4 py-3 text-center text-xs tracking-wide text-emerald-400">
                 Saved to history ✓
               </p>
             ) : null}
@@ -571,7 +571,7 @@ function Index() {
                 <div
                   key={idx}
                   className={`manuscript-card manuscript-card-hover rounded-lg p-4 ${
-                    idx === 0 ? "border-amber-500/40" : ""
+                    idx === 0 ? "border-emerald-500/40" : ""
                   }`}
                 >
                   <div className="flex items-baseline justify-between gap-3">
@@ -580,7 +580,7 @@ function Index() {
                         <span className="font-serif text-lg font-semibold text-text-primary">
                           {m.kignit.name}
                         </span>
-                        <span className="font-mono text-sm tracking-wide text-amber-500">
+                        <span className="font-mono text-sm tracking-wide text-emerald-500">
                           {m.kignit.amharic}
                         </span>
                         <span className="font-sans text-xs text-text-muted">
@@ -591,7 +591,7 @@ function Index() {
                         {m.kignit.description}
                       </p>
                       <div className="mt-3">
-                        <p className="font-sans text-[10px] uppercase tracking-[0.12em] text-amber-500/50">
+                        <p className="font-sans text-[10px] uppercase tracking-[0.12em] text-emerald-500/50">
                           Scale &middot; {scaleIntervals(m.kignit).join("-")} semitones
                         </p>
                         <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -600,8 +600,8 @@ function Index() {
                               key={i}
                               className={`font-mono rounded-md px-2 py-0.5 text-xs ${
                                 i === 0
-                                  ? "bg-amber-500 text-ink"
-                                  : "border border-amber-500/25 text-text-secondary"
+                                  ? "bg-emerald-500 text-ink"
+                                  : "border border-emerald-500/25 text-text-secondary"
                               }`}
                             >
                               {n}
@@ -611,7 +611,7 @@ function Index() {
                       </div>
                     </div>
                     <div className="shrink-0 text-right">
-                      <div className="font-serif text-2xl font-bold tracking-tight text-amber-400">
+                      <div className="font-serif text-2xl font-bold tracking-tight text-emerald-400">
                         {(m.score * 100).toFixed(0)}%
                       </div>
                       <p className="font-sans text-[10px] uppercase tracking-[0.12em] text-text-muted">

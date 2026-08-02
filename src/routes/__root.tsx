@@ -86,7 +86,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Detect the ቅኝት (kignit) of Ethiopian kirar and begena mezmurs by listening or uploading audio.",
       },
-      { name: "theme-color", content: "#1a0f08" },
+      { name: "theme-color", content: "#06130e" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { name: "apple-mobile-web-app-title", content: "ቅኝት Finder" },
@@ -133,12 +133,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function Nav() {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-amber-500/10 bg-[#1a0f08]">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-emerald-500/10 bg-[#06130e]">
       <div className="mx-auto flex max-w-lg items-center justify-around">
         <Link
           to="/"
-          className="group flex flex-1 flex-col items-center gap-0.5 px-3 py-2.5 text-[10px] font-sans font-medium uppercase tracking-[0.12em] text-amber-200/40 transition-colors duration-200 hover:text-amber-200/70 aria-[current]:text-amber-400"
-          activeProps={{ className: "text-amber-400" }}
+          className="group flex flex-1 flex-col items-center gap-0.5 px-3 py-2.5 text-[10px] font-sans font-medium uppercase tracking-[0.12em] text-emerald-200/40 transition-colors duration-200 hover:text-emerald-200/70 aria-[current]:text-emerald-400"
+          activeProps={{ className: "text-emerald-400" }}
           inactiveProps={{}}
         >
           <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
@@ -149,8 +149,8 @@ function Nav() {
         </Link>
         <Link
           to="/kignits"
-          className="group flex flex-1 flex-col items-center gap-0.5 px-3 py-2.5 text-[10px] font-sans font-medium uppercase tracking-[0.12em] text-amber-200/40 transition-colors duration-200 hover:text-amber-200/70 aria-[current]:text-amber-400"
-          activeProps={{ className: "text-amber-400" }}
+          className="group flex flex-1 flex-col items-center gap-0.5 px-3 py-2.5 text-[10px] font-sans font-medium uppercase tracking-[0.12em] text-emerald-200/40 transition-colors duration-200 hover:text-emerald-200/70 aria-[current]:text-emerald-400"
+          activeProps={{ className: "text-emerald-400" }}
           inactiveProps={{}}
         >
           <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
@@ -161,8 +161,8 @@ function Nav() {
         </Link>
         <Link
           to="/tuner"
-          className="group flex flex-1 flex-col items-center gap-0.5 px-2 py-2.5 text-[10px] font-sans font-medium uppercase tracking-[0.12em] text-amber-200/40 transition-colors duration-200 hover:text-amber-200/70 aria-[current]:text-amber-400"
-          activeProps={{ className: "text-amber-400" }}
+          className="group flex flex-1 flex-col items-center gap-0.5 px-2 py-2.5 text-[10px] font-sans font-medium uppercase tracking-[0.12em] text-emerald-200/40 transition-colors duration-200 hover:text-emerald-200/70 aria-[current]:text-emerald-400"
+          activeProps={{ className: "text-emerald-400" }}
           inactiveProps={{}}
         >
           <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
@@ -173,8 +173,8 @@ function Nav() {
         </Link>
         <Link
           to="/history"
-          className="group flex flex-1 flex-col items-center gap-0.5 px-2 py-2.5 text-[10px] font-sans font-medium uppercase tracking-[0.12em] text-amber-200/40 transition-colors duration-200 hover:text-amber-200/70 aria-[current]:text-amber-400"
-          activeProps={{ className: "text-amber-400" }}
+          className="group flex flex-1 flex-col items-center gap-0.5 px-2 py-2.5 text-[10px] font-sans font-medium uppercase tracking-[0.12em] text-emerald-200/40 transition-colors duration-200 hover:text-emerald-200/70 aria-[current]:text-emerald-400"
+          activeProps={{ className: "text-emerald-400" }}
           inactiveProps={{}}
         >
           <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">

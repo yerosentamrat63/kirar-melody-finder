@@ -1,15 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#2a1810"/>
-      <stop offset="100%" stop-color="#1a0f08"/>
+      <stop offset="0%" stop-color="#0d241b"/>
+      <stop offset="100%" stop-color="#06130e"/>
     </linearGradient>
   </defs>
   <rect width="192" height="192" rx="32" fill="url(#bg)"/>
   <g transform="translate(96,96)">
     <!-- Eighth note -->
-    <ellipse cx="-18" cy="18" rx="18" ry="13" fill="#fbbf24" transform="rotate(-20)"/>
-    <rect x="-2" y="-55" width="6" height="73" rx="3" fill="#fbbf24"/>
-    <path d="M4,-55 Q30,-50 36,-30 Q38,-22 34,-14" stroke="#f59e0b" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <ellipse cx="-18" cy="18" rx="18" ry="13" fill="#34d399" transform="rotate(-20)"/>
+    <rect x="-2" y="-55" width="6" height="73" rx="3" fill="#34d399"/>
+    <path d="M4,-55 Q30,-50 36,-30 Q38,-22 34,-14" stroke="#10b981" stroke-width="4" fill="none" stroke-linecap="round"/>
   </g>
 </svg>

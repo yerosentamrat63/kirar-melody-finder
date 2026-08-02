@@ -23,10 +23,10 @@ function KignitsPage() {
     <div className="parchment-bg min-h-screen pb-20 font-sans text-text-primary">
       <div className="mx-auto max-w-3xl px-5 py-10 sm:py-16">
         <header className="mb-12 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-amber-500/60">
-            <span className="inline-block h-px w-6 bg-amber-500/30" />
+          <div className="mb-4 inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-emerald-500/60">
+            <span className="inline-block h-px w-6 bg-emerald-500/30" />
             ቅኝት
-            <span className="inline-block h-px w-6 bg-amber-500/30" />
+            <span className="inline-block h-px w-6 bg-emerald-500/30" />
           </div>
           <h1 className="font-serif text-4xl font-bold tracking-tight sm:text-5xl">
             ቅኝቶች{" "}
@@ -39,7 +39,7 @@ function KignitsPage() {
 
         <section className="manuscript-card rounded-xl p-5 sm:p-7">
           <div className="mb-6">
-            <p className="mb-3 text-center font-sans text-[10px] uppercase tracking-[0.15em] text-amber-500/50">
+            <p className="mb-3 text-center font-sans text-[10px] uppercase tracking-[0.15em] text-emerald-500/50">
               Choose a tonic to see scales
             </p>
             <div className="flex flex-wrap justify-center gap-1.5">
@@ -49,8 +49,8 @@ function KignitsPage() {
                   onClick={() => setTonic(i)}
                   className={`font-mono rounded-md px-3 py-1.5 text-sm transition-all duration-200 ${
                     i === tonic
-                      ? "bg-amber-500 text-ink shadow-sm shadow-amber-500/30"
-                      : "border border-amber-500/20 text-text-secondary hover:border-amber-500/40 hover:text-text-primary"
+                      ? "bg-emerald-500 text-ink shadow-sm shadow-emerald-500/30"
+                      : "border border-emerald-500/20 text-text-secondary hover:border-emerald-500/40 hover:text-text-primary"
                   }`}
                 >
                   {name}
@@ -68,11 +68,11 @@ function KignitsPage() {
                 <li key={k.name} className="manuscript-card manuscript-card-hover rounded-lg p-4">
                   <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
                     <span className="font-serif text-lg font-semibold text-text-primary">{k.name}</span>
-                    <span className="font-mono text-sm tracking-wide text-amber-500">{k.amharic}</span>
+                    <span className="font-mono text-sm tracking-wide text-emerald-500">{k.amharic}</span>
                   </div>
                   <p className="mt-1.5 font-sans text-sm leading-relaxed text-text-secondary">{k.description}</p>
                   <div className="mt-3">
-                    <p className="font-sans text-[10px] uppercase tracking-[0.12em] text-amber-500/50">
+                    <p className="font-sans text-[10px] uppercase tracking-[0.12em] text-emerald-500/50">
                       Scale &middot; {intervals.join(" – ")} semitones
                     </p>
                     <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -81,8 +81,8 @@ function KignitsPage() {
                           key={i}
                           className={`font-mono rounded-md px-2 py-0.5 text-xs ${
                             i === 0
-                              ? "bg-amber-500 text-ink"
-                              : "border border-amber-500/25 text-text-secondary"
+                              ? "bg-emerald-500 text-ink"
+                              : "border border-emerald-500/25 text-text-secondary"
                           }`}
                         >
                           {n}
@@ -95,7 +95,7 @@ function KignitsPage() {
                           key={i}
                           className={`inline-flex h-5 w-5 items-center justify-center rounded text-[9px] font-mono ${
                             k.profile[(i - tonic + 12) % 12] > 0
-                              ? "bg-amber-500/20 text-text-primary"
+                              ? "bg-emerald-500/20 text-text-primary"
                               : "text-text-muted"
                           }`}
                         >

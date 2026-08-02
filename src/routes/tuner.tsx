@@ -125,11 +125,11 @@ function TunerPage() {
 
   const barColor =
     Math.abs(cents) <= 3
-      ? "bg-amber-400"
+      ? "bg-emerald-400"
       : Math.abs(cents) <= 10
-        ? "bg-amber-500/80"
+        ? "bg-emerald-500/80"
         : Math.abs(cents) <= 25
-          ? "bg-amber-600/60"
+          ? "bg-emerald-600/60"
           : "bg-red-600/50";
 
   const tickMarks = [-50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50];
@@ -138,10 +138,10 @@ function TunerPage() {
     <div className="parchment-bg min-h-screen pb-20 font-sans text-text-primary">
       <div className="mx-auto max-w-3xl px-5 py-10 sm:py-16">
         <header className="mb-8 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-amber-500/60">
-            <span className="inline-block h-px w-6 bg-amber-500/30" />
+          <div className="mb-4 inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-emerald-500/60">
+            <span className="inline-block h-px w-6 bg-emerald-500/30" />
             tuner
-            <span className="inline-block h-px w-6 bg-amber-500/30" />
+            <span className="inline-block h-px w-6 bg-emerald-500/30" />
           </div>
           <h1 className="font-serif text-4xl font-bold tracking-tight sm:text-5xl">
             Chromatic{" "}
@@ -166,7 +166,7 @@ function TunerPage() {
               <div className="flex items-baseline gap-2">
                 <span
                   className={`font-serif text-7xl font-bold tracking-tight sm:text-8xl transition-colors duration-150 ${
-                    inTune ? "text-amber-400" : "text-text-primary"
+                    inTune ? "text-emerald-400" : "text-text-primary"
                   }`}
                 >
                   {note}
@@ -178,12 +178,12 @@ function TunerPage() {
 
               <div className="w-full max-w-sm">
                 <div className="relative flex h-14 items-center">
-                  <span className="absolute -left-1 z-10 text-lg text-amber-600/60 select-none">♭</span>
-                  <span className="absolute -right-1 z-10 text-lg text-amber-600/60 select-none">♯</span>
+                  <span className="absolute -left-1 z-10 text-lg text-emerald-600/60 select-none">♭</span>
+                  <span className="absolute -right-1 z-10 text-lg text-emerald-600/60 select-none">♯</span>
 
                   <div className="relative mx-5 w-full h-full">
                     <div className="absolute inset-0 flex items-center">
-                      <div className="relative w-full h-8 rounded-full border border-amber-700/20 bg-amber-900/10 overflow-hidden">
+                      <div className="relative w-full h-8 rounded-full border border-emerald-700/20 bg-emerald-900/10 overflow-hidden">
                         <div
                           className={`absolute top-0 h-full rounded-full transition-all duration-75 ${barColor}`}
                           style={{
@@ -204,7 +204,7 @@ function TunerPage() {
                                 style={{ left: `${pos}%`, transform: "translateX(-50%)" }}
                               >
                                 <div
-                                  className={`${major ? "w-0.5 h-full bg-amber-500/40" : "w-px h-1/2 bg-amber-500/15"}`}
+                                  className={`${major ? "w-0.5 h-full bg-emerald-500/40" : "w-px h-1/2 bg-emerald-500/15"}`}
                                   style={{
                                     marginTop: major ? "0" : "25%",
                                   }}
@@ -222,11 +222,11 @@ function TunerPage() {
                         style={{ left: `${((clampedCents + 50) / 100) * 100}%`, transform: "translateX(-50%)" }}
                       >
                         <div
-                          className={`h-4 w-0.5 rounded-full ${inTune ? "bg-amber-400" : "bg-amber-500/50"}`}
+                          className={`h-4 w-0.5 rounded-full ${inTune ? "bg-emerald-400" : "bg-emerald-500/50"}`}
                         />
                         <span
                           className={`mt-1 font-mono text-xs whitespace-nowrap ${
-                            inTune ? "text-amber-400 font-bold" : "text-text-muted"
+                            inTune ? "text-emerald-400 font-bold" : "text-text-muted"
                           }`}
                         >
                           {clampedCents > 0 ? "+" : ""}{Math.round(clampedCents)}&cent;
@@ -250,8 +250,8 @@ function TunerPage() {
                     className={`inline-flex h-7 w-7 items-center justify-center rounded text-[10px] font-mono transition-all duration-100 ${
                       n === note
                         ? inTune
-                          ? "bg-amber-500 text-ink scale-110 shadow-sm shadow-amber-500/30"
-                          : "border border-amber-500/40 bg-amber-500/15 text-amber-300"
+                          ? "bg-emerald-500 text-ink scale-110 shadow-sm shadow-emerald-500/30"
+                          : "border border-emerald-500/40 bg-emerald-500/15 text-emerald-300"
                         : "text-text-muted"
                     }`}
                   >

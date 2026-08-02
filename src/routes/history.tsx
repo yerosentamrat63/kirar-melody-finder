@@ -55,10 +55,10 @@ function HistoryPage() {
     <div className="parchment-bg min-h-screen pb-20 font-sans text-text-primary">
       <div className="mx-auto max-w-3xl px-5 py-10 sm:py-16">
         <header className="mb-12 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-amber-500/60">
-            <span className="inline-block h-px w-6 bg-amber-500/30" />
+          <div className="mb-4 inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-emerald-500/60">
+            <span className="inline-block h-px w-6 bg-emerald-500/30" />
             history
-            <span className="inline-block h-px w-6 bg-amber-500/30" />
+            <span className="inline-block h-px w-6 bg-emerald-500/30" />
           </div>
           <h1 className="font-serif text-4xl font-bold tracking-tight sm:text-5xl">
             Detection{" "}
@@ -115,12 +115,12 @@ function HistoryPage() {
                       <span className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-0.5">
                         <span
                           className={`shrink-0 font-serif font-semibold ${
-                            entry.name ? "text-base text-amber-400" : "text-lg"
+                            entry.name ? "text-base text-emerald-400" : "text-lg"
                           }`}
                         >
                           {entry.matches[0]?.kignit.name ?? "—"}
                         </span>
-                        <span className="shrink-0 font-mono text-xs text-amber-500/60">
+                        <span className="shrink-0 font-mono text-xs text-emerald-500/60">
                           {entry.matches[0]?.kignit.amharic ?? ""}
                         </span>
                         <span className="hidden shrink-0 text-xs text-text-muted sm:inline">
@@ -139,7 +139,7 @@ function HistoryPage() {
                   </button>
 
                   {expanded === entry.id && (
-                    <div className="border-t border-amber-500/10 px-4 py-4">
+                    <div className="border-t border-emerald-500/10 px-4 py-4">
                       <div className="mb-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-text-muted">
                         <span>Method: {entry.method === "mic" ? "Microphone" : "File upload"}</span>
                         {entry.name && <span>Name: {entry.name}</span>}
@@ -154,8 +154,8 @@ function HistoryPage() {
                             key={idx}
                             className={`rounded-lg border p-3 ${
                               idx === 0
-                                ? "border-amber-500/30 bg-amber-500/8"
-                                : "border-amber-500/10"
+                                ? "border-emerald-500/30 bg-emerald-500/8"
+                                : "border-emerald-500/10"
                             }`}
                           >
                             <div className="flex items-baseline justify-between gap-2">
@@ -163,14 +163,14 @@ function HistoryPage() {
                                 <span className="font-serif text-sm font-semibold text-text-primary">
                                   {m.kignit.name}
                                 </span>
-                                <span className="ml-2 font-mono text-xs text-amber-500/70">
+                                <span className="ml-2 font-mono text-xs text-emerald-500/70">
                                   {m.kignit.amharic}
                                 </span>
                                 <span className="ml-2 text-xs text-text-muted">
                                   tonic {PITCH_NAMES[m.tonic]}
                                 </span>
                               </div>
-                              <span className="shrink-0 font-serif text-lg font-bold text-amber-400">
+                              <span className="shrink-0 font-serif text-lg font-bold text-emerald-400">
                                 {(m.score * 100).toFixed(0)}%
                               </span>
                             </div>
