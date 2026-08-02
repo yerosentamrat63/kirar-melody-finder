@@ -8,6 +8,7 @@ export interface HistoryEntry {
   timestamp: number;
   method: "mic" | "file";
   fileName?: string;
+  name?: string;
   duration?: number;
   matches: KignitMatch[];
   histogram: number[];

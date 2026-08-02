@@ -10,7 +10,7 @@ import {
   type KignitMatch,
 } from "@/lib/pitch";
 import { RangeSlider } from "@/components/RangeSlider";
-import { saveEntry } from "@/lib/history";
+import { saveEntry, type HistoryEntry } from "@/lib/history";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -110,6 +110,12 @@ function Index() {
   const [fileDuration, setFileDuration] = useState(0);
   const [selectedDuration, setSelectedDuration] = useState(0);
 
+  const [pendingEntry, setPendingEntry] = useState<
+    Omit<HistoryEntry, "id" | "timestamp" | "name"> | null
+  >(null);
+  const [entryName, setEntryName] = useState("");
+  const [savedFlash, setSavedFlash] = useState(false);
+
   const audioCtxRef = useRef<AudioContext | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
@@ -140,6 +146,8 @@ function Index() {
   async function start() {
     setError(null);
     setMatches([]);
+    setPendingEntry(null);
+    setSavedFlash(false);
     histRef.current = new Array(12).fill(0);
     setHistogram([...histRef.current]);
     try {
@@ -183,18 +191,22 @@ function Index() {
     const results = matchKignit(histRef.current);
     setMatches(results.slice(0, 5));
     setStatus("done");
-    saveEntry({
+    setPendingEntry({
       method: "mic",
       duration: elapsed,
       matches: results.slice(0, 5),
       histogram: [...histRef.current],
       totalNotes: histRef.current.reduce((s, v) => s + v, 0),
     });
+    setEntryName("");
+    setSavedFlash(false);
   }
 
   async function loadFile(file: File) {
     setError(null);
     setMatches([]);
+    setPendingEntry(null);
+    setSavedFlash(false);
     setFileName(file.name);
     setStatus("loading");
     try {
@@ -309,14 +321,28 @@ function Index() {
     const results = matchKignit(histRef.current);
     setMatches(results.slice(0, 5));
     setStatus("done");
-    saveEntry({
+    setPendingEntry({
       method: "file",
       fileName,
-      duration: fileDuration,
+      duration: selectedDuration,
       matches: results.slice(0, 5),
       histogram: [...histRef.current],
       totalNotes: histRef.current.reduce((s, v) => s + v, 0),
     });
+    setEntryName("");
+    setSavedFlash(false);
+  }
+
+  function handleSaveEntry() {
+    if (!pendingEntry) return;
+    saveEntry({
+      ...pendingEntry,
+      name: entryName.trim() || undefined,
+    });
+    setPendingEntry(null);
+    setEntryName("");
+    setSavedFlash(true);
+    setTimeout(() => setSavedFlash(false), 3000);
   }
 
   function backToCrop() {
@@ -497,6 +523,49 @@ function Index() {
                 ← Adjust segment
               </button>
             </div>
+
+            {pendingEntry ? (
+              <div className="mb-4 rounded-lg border border-amber-500/25 bg-amber-500/8 p-4">
+                <p className="mb-2 text-[10px] font-sans uppercase tracking-[0.15em] text-amber-500/50">
+                  Save to history
+                </p>
+                {pendingEntry.totalNotes === 0 && (
+                  <p className="mb-2 text-[11px] leading-relaxed text-red-400/80">
+                    No notes were detected — this capture was likely too short or silent. Consider
+                    listening longer before saving.
+                  </p>
+                )}
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <input
+                    type="text"
+                    value={entryName}
+                    onChange={(e) => setEntryName(e.target.value)}
+                    placeholder={
+                      pendingEntry.method === "file" && pendingEntry.fileName
+                        ? pendingEntry.fileName
+                        : "Mezmur name (optional)"
+                    }
+                    className="min-w-0 flex-1 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2.5 text-sm text-text-primary outline-none transition placeholder:text-text-muted/60 focus:border-amber-500/50"
+                  />
+                  <button
+                    onClick={handleSaveEntry}
+                    className="btn-gold shrink-0 rounded-lg px-5 py-2.5 text-sm"
+                  >
+                    Save
+                  </button>
+                </div>
+                {pendingEntry.totalNotes > 0 && pendingEntry.totalNotes < 600 && (
+                  <p className="mt-2 text-[11px] text-amber-500/60">
+                    Tip: aim for 900–1000+ detected notes for the most reliable kignit.
+                  </p>
+                )}
+              </div>
+            ) : savedFlash ? (
+              <p className="mb-4 rounded-lg border border-amber-500/25 bg-amber-500/8 px-4 py-3 text-center text-xs tracking-wide text-amber-400">
+                Saved to history ✓
+              </p>
+            ) : null}
+
             <div className="space-y-3">
               {matches.map((m, idx) => (
                 <div

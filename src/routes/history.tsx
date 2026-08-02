@@ -106,15 +106,26 @@ function HistoryPage() {
                     onClick={() => setExpanded(expanded === entry.id ? null : entry.id)}
                     className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
                   >
-                    <div className="flex min-w-0 items-center gap-3">
-                      <span className="shrink-0 font-serif text-lg font-semibold text-amber-400">
-                        {entry.matches[0]?.kignit.name ?? "—"}
-                      </span>
-                      <span className="shrink-0 font-mono text-xs text-amber-500/60">
-                        {entry.matches[0]?.kignit.amharic ?? ""}
-                      </span>
-                      <span className="hidden shrink-0 text-xs text-text-muted sm:inline">
-                        {entry.method === "mic" ? "mic" : entry.fileName ?? "file"}
+                    <div className="flex min-w-0 flex-col items-start gap-0.5">
+                      {entry.name ? (
+                        <span className="truncate font-serif text-lg font-semibold text-text-primary">
+                          {entry.name}
+                        </span>
+                      ) : null}
+                      <span className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-0.5">
+                        <span
+                          className={`shrink-0 font-serif font-semibold ${
+                            entry.name ? "text-base text-amber-400" : "text-lg"
+                          }`}
+                        >
+                          {entry.matches[0]?.kignit.name ?? "—"}
+                        </span>
+                        <span className="shrink-0 font-mono text-xs text-amber-500/60">
+                          {entry.matches[0]?.kignit.amharic ?? ""}
+                        </span>
+                        <span className="hidden shrink-0 text-xs text-text-muted sm:inline">
+                          {entry.method === "mic" ? "mic" : entry.fileName ?? "file"}
+                        </span>
                       </span>
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
@@ -131,6 +142,7 @@ function HistoryPage() {
                     <div className="border-t border-amber-500/10 px-4 py-4">
                       <div className="mb-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-text-muted">
                         <span>Method: {entry.method === "mic" ? "Microphone" : "File upload"}</span>
+                        {entry.name && <span>Name: {entry.name}</span>}
                         {entry.fileName && <span>File: {entry.fileName}</span>}
                         {entry.duration && <span>Duration: {formatDuration(entry.duration)}</span>}
                         <span>Notes detected: {entry.totalNotes}</span>
