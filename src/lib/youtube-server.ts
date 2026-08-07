@@ -588,6 +588,14 @@ async function handleDiag(url: URL): Promise<Response> {
     },
   ];
   const visitorData = await fetchVisitorData();
+  results.push({
+    client: `__visitorData: ${visitorData ? String(visitorData).length + " chars" : "FAILED"}`,
+    http: 0,
+    playability: null,
+    reason: visitorData ? String(visitorData).slice(0, 40) : null,
+    audio: 0,
+    direct: 0,
+  });
   for (const c of candidates) {
     try {
       const headers: Record<string, string> = {
