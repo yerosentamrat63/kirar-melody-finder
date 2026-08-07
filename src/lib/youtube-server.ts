@@ -114,18 +114,30 @@ function hasDirectAudio(data: PlayerResponse): boolean {
 
 async function fetchVisitorData(): Promise<string | null> {
   try {
-    const webContext = {
-      client: { clientName: "WEB", clientVersion: "2.20240718.02.00", hl: "en", gl: "US" },
+    const vrContext = {
+      client: {
+        clientName: "ANDROID_VR",
+        clientVersion: "1.62.22",
+        deviceMake: "Oculus",
+        deviceModel: "Quest 3",
+        androidSdkVersion: 32,
+        userAgent: ANDROID_VR_UA,
+        hl: "en",
+        gl: "US",
+        timeZone: "UTC",
+        utcOffsetMinutes: 0,
+      },
     };
     const res = await fetch(`${INNERTUBE_ENDPOINT.replace(/player$/, "visitor_id")}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "User-Agent": ANDROID_VR_UA },
-      body: JSON.stringify({ context: webContext }),
+      body: JSON.stringify({ context: vrContext }),
       signal: AbortSignal.timeout(10000),
     });
     if (!res.ok) return null;
     const data = (await res.json()) as { responseContext?: { visitorData?: string } };
-    return data.responseContext?.visitorData ?? null;
+    const vd = data.responseContext?.visitorData ?? null;
+    return vd && vd.length > 100 ? vd : null;
   } catch (e) {
     console.error("[youtube] visitorData fetch failed:", e);
     return null;
