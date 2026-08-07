@@ -112,9 +112,30 @@ function hasDirectAudio(data: PlayerResponse): boolean {
   );
 }
 
+async function fetchVisitorData(): Promise<string | null> {
+  try {
+    const webContext = {
+      client: { clientName: "WEB", clientVersion: "2.20240718.02.00", hl: "en", gl: "US" },
+    };
+    const res = await fetch(`${INNERTUBE_ENDPOINT.replace(/player$/, "visitor_id")}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "User-Agent": ANDROID_VR_UA },
+      body: JSON.stringify({ context: webContext }),
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { responseContext?: { visitorData?: string } };
+    return data.responseContext?.visitorData ?? null;
+  } catch (e) {
+    console.error("[youtube] visitorData fetch failed:", e);
+    return null;
+  }
+}
+
 async function requestPlayer(
   videoId: string,
 ): Promise<{ data: PlayerResponse; client: (typeof PLAYER_CLIENTS)[number] } | null> {
+  const visitorData = await fetchVisitorData();
   for (const client of PLAYER_CLIENTS) {
     try {
       const headers: Record<string, string> = {
@@ -125,11 +146,17 @@ async function requestPlayer(
       if (client.xClientName) headers["X-YouTube-Client-Name"] = client.xClientName;
       if (client.xClientVersion) headers["X-YouTube-Client-Version"] = client.xClientVersion;
 
+      const context = { ...client.context };
+      if (visitorData) {
+        const c = (context as { client: Record<string, unknown> }).client;
+        c.visitorData = visitorData;
+      }
+
       const res = await fetch(INNERTUBE_ENDPOINT, {
         method: "POST",
         headers,
         body: JSON.stringify({
-          context: client.context,
+          context,
           videoId,
           contentCheckOk: true,
           racyCheckOk: true,
@@ -560,6 +587,7 @@ async function handleDiag(url: URL): Promise<Response> {
       },
     },
   ];
+  const visitorData = await fetchVisitorData();
   for (const c of candidates) {
     try {
       const headers: Record<string, string> = {
@@ -569,10 +597,14 @@ async function handleDiag(url: URL): Promise<Response> {
       };
       if (c.xn) headers["X-YouTube-Client-Name"] = c.xn;
       if (c.xv) headers["X-YouTube-Client-Version"] = c.xv;
+      const context = structuredClone(c.ctx);
+      if (visitorData) {
+        (context as { client: Record<string, unknown> }).client.visitorData = visitorData;
+      }
       const res = await fetch(INNERTUBE_ENDPOINT, {
         method: "POST",
         headers,
-        body: JSON.stringify({ context: c.ctx, videoId, contentCheckOk: true, racyCheckOk: true }),
+        body: JSON.stringify({ context, videoId, contentCheckOk: true, racyCheckOk: true }),
         signal: AbortSignal.timeout(15000),
       });
       const data = (await res.json()) as PlayerResponse;
