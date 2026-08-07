@@ -299,10 +299,308 @@ export async function handleYoutubeApiRequest(request: Request, url: URL): Promi
     const path = url.pathname.replace(/\/+$/, "");
     if (path === "/api/youtube/info") return await handleInfo(url);
     if (path === "/api/youtube/stream") return await handleStream(request, url);
+    if (path === "/api/youtube/diag") return await handleDiag(url);
     return json({ ok: false, error: "Not found." }, 404);
   } catch (e) {
     if (e instanceof YoutubeError) return json({ ok: false, error: e.message }, e.status);
     console.error("[youtube] unexpected error:", e);
     return json({ ok: false, error: "Unexpected server error while contacting YouTube." }, 500);
   }
+}
+
+async function handleDiag(url: URL): Promise<Response> {
+  const raw = url.searchParams.get("v") ?? url.searchParams.get("url") ?? "";
+  const videoId = parseVideoId(raw) ?? raw.slice(0, 11);
+  const results: {
+    client: string;
+    http: number;
+    playability: string | null;
+    reason: string | null;
+    audio: number;
+    direct: number;
+  }[] = [];
+  const UA_CHROME =
+    "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36";
+  const UA_CHROME_WIN =
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36";
+  const UA_IOS = "com.google.ios.youtube/20.13.3 (iPhone16,3; U; CPU iOS 17_6_1 like Mac OS X;)";
+  const UA_TV =
+    "Mozilla/5.0 (SMART-TV; Linux; Tizen 6.0) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/5.0 Chrome/63.0.3239.84 Safari/537.36";
+  const candidates: { name: string; ctx: object; ua: string; xn?: string; xv?: string }[] = [
+    {
+      name: "ANDROID 20.24.38",
+      ua: UA_CHROME,
+      xn: "3",
+      xv: "20.24.38",
+      ctx: {
+        client: {
+          clientName: "ANDROID",
+          clientVersion: "20.24.38",
+          androidSdkVersion: 33,
+          userAgent: UA_CHROME,
+          hl: "en",
+          gl: "US",
+          timeZone: "UTC",
+          utcOffsetMinutes: 0,
+        },
+      },
+    },
+    {
+      name: "ANDROID 19.09.37",
+      ua: UA_CHROME,
+      xn: "3",
+      xv: "19.09.37",
+      ctx: {
+        client: {
+          clientName: "ANDROID",
+          clientVersion: "19.09.37",
+          androidSdkVersion: 30,
+          userAgent: UA_CHROME,
+          hl: "en",
+          gl: "US",
+        },
+      },
+    },
+    {
+      name: "ANDROID 21.04.34",
+      ua: UA_CHROME,
+      xn: "3",
+      xv: "21.04.34",
+      ctx: {
+        client: {
+          clientName: "ANDROID",
+          clientVersion: "21.04.34",
+          androidSdkVersion: 33,
+          userAgent: UA_CHROME,
+          hl: "en",
+          gl: "US",
+        },
+      },
+    },
+    {
+      name: "IOS 20.13.3",
+      ua: UA_IOS,
+      xn: "5",
+      xv: "20.13.3",
+      ctx: {
+        client: {
+          clientName: "IOS",
+          clientVersion: "20.13.3",
+          deviceModel: "iPhone16,3",
+          userAgent: UA_IOS,
+          hl: "en",
+          gl: "US",
+        },
+      },
+    },
+    {
+      name: "IOS 21.02.2",
+      ua: "com.google.ios.youtube/21.02.2 (iPhone16,3; U; CPU iOS 17_6_1 like Mac OS X;)",
+      xn: "5",
+      xv: "21.02.2",
+      ctx: {
+        client: {
+          clientName: "IOS",
+          clientVersion: "21.02.2",
+          deviceModel: "iPhone16,3",
+          userAgent:
+            "com.google.ios.youtube/21.02.2 (iPhone16,3; U; CPU iOS 17_6_1 like Mac OS X;)",
+          hl: "en",
+          gl: "US",
+        },
+      },
+    },
+    {
+      name: "ANDROID_VR 1.62.22",
+      ua: ANDROID_VR_UA,
+      xn: "28",
+      xv: "1.62.22",
+      ctx: {
+        client: {
+          clientName: "ANDROID_VR",
+          clientVersion: "1.62.22",
+          deviceMake: "Oculus",
+          deviceModel: "Quest 3",
+          androidSdkVersion: 32,
+          userAgent: ANDROID_VR_UA,
+          hl: "en",
+          gl: "US",
+        },
+      },
+    },
+    {
+      name: "ANDROID_VR 1.60.19",
+      ua: "com.google.android.apps.youtube.vr.oculus/1.60.19 (Linux; U; Android 12; en_US) gzip",
+      xn: "28",
+      xv: "1.60.19",
+      ctx: {
+        client: {
+          clientName: "ANDROID_VR",
+          clientVersion: "1.60.19",
+          deviceMake: "Oculus",
+          deviceModel: "Quest 3",
+          androidSdkVersion: 32,
+          userAgent:
+            "com.google.android.apps.youtube.vr.oculus/1.60.19 (Linux; U; Android 12; en_US) gzip",
+          hl: "en",
+          gl: "US",
+        },
+      },
+    },
+    {
+      name: "ANDROID_MUSIC 7.04.51",
+      ua: "com.google.android.apps.youtube.music/7.04.51 (Linux; U; Android 12; en_US) gzip",
+      xn: "21",
+      xv: "7.04.51",
+      ctx: {
+        client: {
+          clientName: "ANDROID_MUSIC",
+          clientVersion: "7.04.51",
+          androidSdkVersion: 32,
+          userAgent:
+            "com.google.android.apps.youtube.music/7.04.51 (Linux; U; Android 12; en_US) gzip",
+          hl: "en",
+          gl: "US",
+        },
+      },
+    },
+    {
+      name: "IOS_MUSIC 7.04.5",
+      ua: "com.google.ios.youtube.music/7.04.5 (iPhone16,3; U; CPU iOS 17_6_1 like Mac OS X;)",
+      xn: "26",
+      xv: "7.04.5",
+      ctx: {
+        client: {
+          clientName: "IOS_MUSIC",
+          clientVersion: "7.04.5",
+          deviceModel: "iPhone16,3",
+          userAgent:
+            "com.google.ios.youtube.music/7.04.5 (iPhone16,3; U; CPU iOS 17_6_1 like Mac OS X;)",
+          hl: "en",
+          gl: "US",
+        },
+      },
+    },
+    {
+      name: "TVHTML5_SIMPLY_EMBEDDED_PLAYER 2.0",
+      ua: UA_TV,
+      xn: "9",
+      xv: "2.0",
+      ctx: {
+        client: {
+          clientName: "TVHTML5_SIMPLY_EMBEDDED_PLAYER",
+          clientVersion: "2.0",
+          clientScreen: "EMBED",
+          userAgent: UA_TV,
+          hl: "en",
+          gl: "US",
+        },
+      },
+    },
+    {
+      name: "TVHTML5_SIMPLY_EMBEDDED_PLAYER 2.20240718.00.00",
+      ua: UA_TV,
+      xn: "9",
+      xv: "2.20240718.00.00",
+      ctx: {
+        client: {
+          clientName: "TVHTML5_SIMPLY_EMBEDDED_PLAYER",
+          clientVersion: "2.20240718.00.00",
+          clientScreen: "EMBED",
+          userAgent: UA_TV,
+          hl: "en",
+          gl: "US",
+        },
+      },
+    },
+    {
+      name: "WEB_EMBEDDED_PLAYER 1.20240625.01.00",
+      ua: UA_CHROME_WIN,
+      xn: "56",
+      xv: "1.20240625.01.00",
+      ctx: {
+        client: {
+          clientName: "WEB_EMBEDDED_PLAYER",
+          clientVersion: "1.20240625.01.00",
+          clientScreen: "EMBED",
+          userAgent: UA_CHROME_WIN,
+          hl: "en",
+          gl: "US",
+        },
+      },
+    },
+    {
+      name: "WEB 2.20240718.02.00",
+      ua: UA_CHROME_WIN,
+      xn: "1",
+      xv: "2.20240718.02.00",
+      ctx: {
+        client: {
+          clientName: "WEB",
+          clientVersion: "2.20240718.02.00",
+          userAgent: UA_CHROME_WIN,
+          hl: "en",
+          gl: "US",
+        },
+      },
+    },
+    {
+      name: "ANDROID_TESTSUITE 1.9",
+      ua: UA_CHROME,
+      xn: "30",
+      xv: "1.9",
+      ctx: {
+        client: {
+          clientName: "ANDROID_TESTSUITE",
+          clientVersion: "1.9",
+          userAgent: UA_CHROME,
+          hl: "en",
+          gl: "US",
+        },
+      },
+    },
+  ];
+  for (const c of candidates) {
+    try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        "User-Agent": c.ua,
+        "Accept-Language": "en-US,en;q=0.9",
+      };
+      if (c.xn) headers["X-YouTube-Client-Name"] = c.xn;
+      if (c.xv) headers["X-YouTube-Client-Version"] = c.xv;
+      const res = await fetch(INNERTUBE_ENDPOINT, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ context: c.ctx, videoId, contentCheckOk: true, racyCheckOk: true }),
+        signal: AbortSignal.timeout(15000),
+      });
+      const data = (await res.json()) as PlayerResponse;
+      const af = data.streamingData?.adaptiveFormats ?? [];
+      results.push({
+        client: c.name,
+        http: res.status,
+        playability: data.playabilityStatus?.status ?? null,
+        reason: data.playabilityStatus?.reason ?? null,
+        audio: af.filter((f) => (f.mimeType ?? "").startsWith("audio/")).length,
+        direct: af.filter(
+          (f) =>
+            (f.mimeType ?? "").startsWith("audio/") &&
+            typeof f.url === "string" &&
+            f.url.length > 0,
+        ).length,
+      });
+    } catch (e) {
+      results.push({
+        client: c.name,
+        http: 0,
+        playability: null,
+        reason: String(e instanceof Error ? e.message : e),
+        audio: 0,
+        direct: 0,
+      });
+    }
+    await new Promise((r) => setTimeout(r, 250));
+  }
+  return json({ ok: true, videoId, results });
 }
