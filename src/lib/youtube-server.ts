@@ -12,11 +12,16 @@ class YoutubeError extends Error {
 }
 
 // YouTube withholds streaming URLs from datacenter IPs for web clients
-// (PO-token bot check). The ANDROID_VR client is served direct, signed URLs
-// without cipher decoding or a PO token, so it works from serverless IPs.
-// These values track the public Oculus app; bump when YouTube rotates.
+// (PO-token bot check). Mobile clients (ANDROID / IOS / ANDROID_VR) are served
+// direct, signed URLs without cipher decoding or a PO token, so they work from
+// serverless IPs. YouTube periodically flags older client versions (older
+// ANDROID_VR builds return "Sign in to confirm you're not a bot"), so the
+// rotation tries current mobile builds first, newest first.
+const ANDROID_UA =
+  "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36";
+const IOS_UA = "com.google.ios.youtube/20.13.3 (iPhone16,3; U; CPU iOS 17_6_1 like Mac OS X;)";
 const ANDROID_VR_UA =
-  "com.google.android.apps.youtube.vr.oculus/1.60.19 (Linux; U; Android 12; en_US) gzip";
+  "com.google.android.apps.youtube.vr.oculus/1.62.22 (Linux; U; Android 12; en_US) gzip";
 
 const PLAYER_CLIENTS: {
   context: object;
@@ -27,8 +32,41 @@ const PLAYER_CLIENTS: {
   {
     context: {
       client: {
+        clientName: "ANDROID",
+        clientVersion: "20.24.38",
+        androidSdkVersion: 33,
+        userAgent: ANDROID_UA,
+        hl: "en",
+        gl: "US",
+        timeZone: "UTC",
+        utcOffsetMinutes: 0,
+      },
+    },
+    userAgent: ANDROID_UA,
+    xClientName: "3",
+    xClientVersion: "20.24.38",
+  },
+  {
+    context: {
+      client: {
+        clientName: "IOS",
+        clientVersion: "20.13.3",
+        deviceModel: "iPhone16,3",
+        userAgent: IOS_UA,
+        hl: "en",
+        gl: "US",
+        utcOffsetMinutes: 0,
+      },
+    },
+    userAgent: IOS_UA,
+    xClientName: "5",
+    xClientVersion: "20.13.3",
+  },
+  {
+    context: {
+      client: {
         clientName: "ANDROID_VR",
-        clientVersion: "1.60.19",
+        clientVersion: "1.62.22",
         deviceMake: "Oculus",
         deviceModel: "Quest 3",
         androidSdkVersion: 32,
@@ -41,21 +79,7 @@ const PLAYER_CLIENTS: {
     },
     userAgent: ANDROID_VR_UA,
     xClientName: "28",
-    xClientVersion: "1.60.19",
-  },
-  {
-    context: {
-      client: {
-        clientName: "ANDROID_TESTSUITE",
-        clientVersion: "1.9",
-        userAgent:
-          "Mozilla/5.0 (Linux; Android 11) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Mobile Safari/537.36",
-        hl: "en",
-        gl: "US",
-      },
-    },
-    userAgent:
-      "Mozilla/5.0 (Linux; Android 11) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Mobile Safari/537.36",
+    xClientVersion: "1.62.22",
   },
 ];
 
@@ -88,7 +112,9 @@ function hasDirectAudio(data: PlayerResponse): boolean {
   );
 }
 
-async function requestPlayer(videoId: string): Promise<PlayerResponse | null> {
+async function requestPlayer(
+  videoId: string,
+): Promise<{ data: PlayerResponse; client: (typeof PLAYER_CLIENTS)[number] } | null> {
   for (const client of PLAYER_CLIENTS) {
     try {
       const headers: Record<string, string> = {
@@ -115,7 +141,7 @@ async function requestPlayer(videoId: string): Promise<PlayerResponse | null> {
       const data = (await res.json()) as PlayerResponse;
       const status = data.playabilityStatus?.status;
       if ((status === "OK" || status === "LIVE_STREAM") && hasDirectAudio(data)) {
-        return data;
+        return { data, client };
       }
     } catch (e) {
       console.error("[youtube] player request failed:", e);
@@ -190,13 +216,14 @@ function extractVideoId(url: URL): string {
 }
 
 async function fetchPlayable(videoId: string) {
-  const data = await requestPlayer(videoId);
-  if (!data) {
+  const found = await requestPlayer(videoId);
+  if (!found) {
     throw new YoutubeError(
       "YouTube did not return a playable player response — the video may be private, age-restricted, region-locked, or a live stream.",
       403,
     );
   }
+  const { data, client } = found;
   const vd = data.videoDetails ?? {};
   const duration = Number(vd.lengthSeconds ?? 0);
   if (!duration || duration <= 0) {
@@ -211,7 +238,7 @@ async function fetchPlayable(videoId: string) {
       400,
     );
   }
-  return { data, title: vd.title ?? "YouTube mezmur", author: vd.author ?? "", duration };
+  return { data, client, title: vd.title ?? "YouTube mezmur", author: vd.author ?? "", duration };
 }
 
 async function handleInfo(url: URL): Promise<Response> {
@@ -229,7 +256,7 @@ async function handleInfo(url: URL): Promise<Response> {
 
 async function handleStream(request: Request, url: URL): Promise<Response> {
   const videoId = extractVideoId(url);
-  const { data } = await fetchPlayable(videoId);
+  const { data, client } = await fetchPlayable(videoId);
 
   const streamUrl = pickAudioUrl(data);
   if (!streamUrl) {
@@ -239,7 +266,7 @@ async function handleStream(request: Request, url: URL): Promise<Response> {
   const range = request.headers.get("range");
   const upstream = await fetch(streamUrl, {
     headers: {
-      "User-Agent": ANDROID_VR_UA,
+      "User-Agent": client.userAgent,
       ...(range ? { range } : {}),
     },
   });
