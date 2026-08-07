@@ -152,7 +152,7 @@ function Index() {
     rafRef.current = null;
   }
 
-  async function start(rawMic = false) {
+  async function start() {
     setError(null);
     setMatches([]);
     setPendingEntry(null);
@@ -163,13 +163,11 @@ function Index() {
     setLiveFreq(0);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        audio: rawMic
-          ? {
-              echoCancellation: false,
-              noiseSuppression: false,
-              autoGainControl: false,
-            }
-          : true,
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+        },
       });
       streamRef.current = stream;
       const AC =
@@ -399,7 +397,7 @@ function Index() {
           <div className="flex flex-col gap-3 sm:flex-row">
             {status !== "recording" ? (
               <button
-                onClick={() => start(false)}
+                onClick={start}
                 disabled={status === "analyzing"}
                 className="btn-gold flex-1 rounded-lg px-5 py-4 text-sm tracking-wide"
               >
@@ -411,16 +409,6 @@ function Index() {
                 className="flex-1 animate-pulse rounded-lg bg-red-600 px-5 py-4 text-sm font-semibold tracking-wide text-white shadow-lg shadow-red-600/20 transition hover:bg-red-500 active:scale-[0.97]"
               >
                 Stop & Analyze ({elapsed.toFixed(1)}s)
-              </button>
-            )}
-
-            {status !== "cropping" && status !== "loading" && status !== "recording" && (
-              <button
-                onClick={() => start(true)}
-                disabled={status === "analyzing"}
-                className="btn-outline flex-1 rounded-lg px-5 py-4 text-sm tracking-wide"
-              >
-                Hear from Device
               </button>
             )}
 
@@ -464,9 +452,8 @@ function Index() {
               </div>
               {liveLevel < 0.01 && elapsed > 2 && (
                 <p className="mt-2 text-[11px] leading-relaxed text-text-muted">
-                  Mic level is very low — nothing is reaching it. If music is playing, the phone may
-                  be muting it while the microphone is recording. Try "Hear from Device" instead,
-                  which requests the raw mic without echo cancellation.
+                  Mic level is very low — nothing is reaching it. If music is playing from the
+                  speaker, try turning the volume up or moving the phone closer.
                 </p>
               )}
             </div>
@@ -474,8 +461,9 @@ function Index() {
 
           {status !== "cropping" && status !== "loading" && status !== "recording" && (
             <p className="mt-4 border-t border-emerald-500/10 pt-4 text-[11px] leading-relaxed text-text-muted">
-              Playing a mezmur in another app (Samsung Music, YouTube Music)? Use "Hear from Device"
-              to listen to what's playing from the speaker.
+              You can also detect a mezmur playing in another app — start it on Samsung Music or
+              YouTube Music, then press "Listen to Mezmur" and it will listen to what's playing from
+              the speaker.
             </p>
           )}
 
