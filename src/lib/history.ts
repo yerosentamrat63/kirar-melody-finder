@@ -6,7 +6,7 @@ const MAX_ENTRIES = 50;
 export interface HistoryEntry {
   id: string;
   timestamp: number;
-  method: "mic" | "file" | "youtube";
+  method: "mic" | "file";
   fileName?: string;
   name?: string;
   duration?: number;

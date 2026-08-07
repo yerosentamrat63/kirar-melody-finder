@@ -11,7 +11,16 @@ interface RangeSliderProps {
   onEndChange: (v: number) => void;
 }
 
-export function RangeSlider({ min, max, step, start, end, maxSeconds, onStartChange, onEndChange }: RangeSliderProps) {
+export function RangeSlider({
+  min,
+  max,
+  step,
+  start,
+  end,
+  maxSeconds,
+  onStartChange,
+  onEndChange,
+}: RangeSliderProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const dragging = useRef<"start" | "end" | null>(null);
   const lastEvent = useRef<PointerEvent | null>(null);
@@ -29,16 +38,13 @@ export function RangeSlider({ min, max, step, start, end, maxSeconds, onStartCha
     [min, max, step],
   );
 
-  const onPointer = useCallback(
-    (e: React.PointerEvent) => {
-      const thumb = (e.target as HTMLElement).closest("[data-thumb]") as HTMLElement | null;
-      if (!thumb) return;
-      dragging.current = thumb.dataset.thumb as "start" | "end";
-      thumb.setPointerCapture(e.pointerId);
-      e.preventDefault();
-    },
-    [],
-  );
+  const onPointer = useCallback((e: React.PointerEvent) => {
+    const thumb = (e.target as HTMLElement).closest("[data-thumb]") as HTMLElement | null;
+    if (!thumb) return;
+    dragging.current = thumb.dataset.thumb as "start" | "end";
+    thumb.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  }, []);
 
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
@@ -75,7 +81,7 @@ export function RangeSlider({ min, max, step, start, end, maxSeconds, onStartCha
   return (
     <div className="flex items-center gap-3">
       <span className="w-10 text-right text-[11px] font-mono text-emerald-200/60">
-        {(start / 100 * (maxSeconds ?? 60)).toFixed(1)}s
+        {((start / 100) * (maxSeconds ?? 60)).toFixed(1)}s
       </span>
       <div
         ref={trackRef}
@@ -107,7 +113,7 @@ export function RangeSlider({ min, max, step, start, end, maxSeconds, onStartCha
         </div>
       </div>
       <span className="w-10 text-left text-[11px] font-mono text-emerald-200/60">
-        {(end / 100 * (maxSeconds ?? 60)).toFixed(1)}s
+        {((end / 100) * (maxSeconds ?? 60)).toFixed(1)}s
       </span>
     </div>
   );

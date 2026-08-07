@@ -61,8 +61,7 @@ function HistoryPage() {
             <span className="inline-block h-px w-6 bg-emerald-500/30" />
           </div>
           <h1 className="font-serif text-4xl font-bold tracking-tight sm:text-5xl">
-            Detection{" "}
-            <span className="text-gradient-gold">History</span>
+            Detection <span className="text-gradient-gold">History</span>
           </h1>
           <p className="mt-3 font-sans text-sm text-text-secondary sm:text-base">
             Past kignit analyses, ordered newest first.
@@ -75,10 +74,7 @@ function HistoryPage() {
             <p className="mt-1 text-xs text-text-muted">
               Detect a kignit first — results appear here automatically.
             </p>
-            <Link
-              to="/"
-              className="btn-gold mt-4 inline-block rounded-lg px-5 py-2.5 text-sm"
-            >
+            <Link to="/" className="btn-gold mt-4 inline-block rounded-lg px-5 py-2.5 text-sm">
               Go to Detector
             </Link>
           </section>
@@ -98,10 +94,7 @@ function HistoryPage() {
 
             <div className="space-y-3">
               {history.map((entry) => (
-                <div
-                  key={entry.id}
-                  className="manuscript-card manuscript-card-hover rounded-lg"
-                >
+                <div key={entry.id} className="manuscript-card manuscript-card-hover rounded-lg">
                   <button
                     onClick={() => setExpanded(expanded === entry.id ? null : entry.id)}
                     className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
@@ -124,11 +117,7 @@ function HistoryPage() {
                           {entry.matches[0]?.kignit.amharic ?? ""}
                         </span>
                         <span className="hidden shrink-0 text-xs text-text-muted sm:inline">
-                          {entry.method === "mic"
-                            ? "mic"
-                            : entry.method === "youtube"
-                              ? "youtube"
-                              : (entry.fileName ?? "file")}
+                          {entry.method === "mic" ? "mic" : (entry.fileName ?? "file")}
                         </span>
                       </span>
                     </div>
@@ -145,14 +134,7 @@ function HistoryPage() {
                   {expanded === entry.id && (
                     <div className="border-t border-emerald-500/10 px-4 py-4">
                       <div className="mb-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-text-muted">
-                        <span>
-                          Method:{" "}
-                          {entry.method === "mic"
-                            ? "Microphone"
-                            : entry.method === "youtube"
-                              ? "YouTube"
-                              : "File upload"}
-                        </span>
+                        <span>Method: {entry.method === "mic" ? "Microphone" : "File upload"}</span>
                         {entry.name && <span>Name: {entry.name}</span>}
                         {entry.fileName && <span>File: {entry.fileName}</span>}
                         {entry.duration && <span>Duration: {formatDuration(entry.duration)}</span>}

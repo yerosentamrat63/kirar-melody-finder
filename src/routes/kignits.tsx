@@ -29,8 +29,7 @@ function KignitsPage() {
             <span className="inline-block h-px w-6 bg-emerald-500/30" />
           </div>
           <h1 className="font-serif text-4xl font-bold tracking-tight sm:text-5xl">
-            ቅኝቶች{" "}
-            <span className="text-gradient-gold">Reference</span>
+            ቅኝቶች <span className="text-gradient-gold">Reference</span>
           </h1>
           <p className="mt-3 font-sans text-sm text-text-secondary sm:text-base">
             The six Ethiopian modal scales (ቅኝት / kignit) used in kirar and begena music.
@@ -67,10 +66,16 @@ function KignitsPage() {
               return (
                 <li key={k.name} className="manuscript-card manuscript-card-hover rounded-lg p-4">
                   <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
-                    <span className="font-serif text-lg font-semibold text-text-primary">{k.name}</span>
-                    <span className="font-mono text-sm tracking-wide text-emerald-500">{k.amharic}</span>
+                    <span className="font-serif text-lg font-semibold text-text-primary">
+                      {k.name}
+                    </span>
+                    <span className="font-mono text-sm tracking-wide text-emerald-500">
+                      {k.amharic}
+                    </span>
                   </div>
-                  <p className="mt-1.5 font-sans text-sm leading-relaxed text-text-secondary">{k.description}</p>
+                  <p className="mt-1.5 font-sans text-sm leading-relaxed text-text-secondary">
+                    {k.description}
+                  </p>
                   <div className="mt-3">
                     <p className="font-sans text-[10px] uppercase tracking-[0.12em] text-emerald-500/50">
                       Scale &middot; {intervals.join(" – ")} semitones
@@ -110,7 +115,8 @@ function KignitsPage() {
           </ul>
 
           <p className="mt-5 text-xs font-sans tracking-wide text-text-muted">
-            Best results with a clear kirar or begena melody, minimal background noise, and 10–30 seconds of playback.
+            Best results with a clear kirar or begena melody, minimal background noise, and 10–30
+            seconds of playback.
           </p>
         </section>
       </div>

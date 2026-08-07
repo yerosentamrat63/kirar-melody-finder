@@ -10,12 +10,6 @@ import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig({
   nitro: {
     preset: "vercel",
-    ...({
-      // YouTube audio streaming runs inside the same serverless function, which
-      // needs more than the 10s default to proxy a full mezmur. Fluid Compute
-      // allows up to 300s on Hobby.
-      vercel: { functions: { maxDuration: 300 } },
-    } as object),
   },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).

@@ -94,8 +94,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "ቅኝት Finder — Ethiopian Kignit Detector" },
       {
         property: "og:description",
-        content:
-          "Identify the Ethiopian modal scale of any kirar or begena mezmur in seconds.",
+        content: "Identify the Ethiopian modal scale of any kirar or begena mezmur in seconds.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

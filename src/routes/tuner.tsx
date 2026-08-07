@@ -59,7 +59,9 @@ function TunerPage() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
-      const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const AC =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       const ctx = new AC();
       ctxRef.current = ctx;
       const source = ctx.createMediaStreamSource(stream);
@@ -144,15 +146,17 @@ function TunerPage() {
             <span className="inline-block h-px w-6 bg-emerald-500/30" />
           </div>
           <h1 className="font-serif text-4xl font-bold tracking-tight sm:text-5xl">
-            Chromatic{" "}
-            <span className="text-gradient-gold">Tuner</span>
+            Chromatic <span className="text-gradient-gold">Tuner</span>
           </h1>
         </header>
 
         <section className="manuscript-card rounded-xl p-5 sm:p-6">
           {!active ? (
             <div className="flex flex-col items-center gap-4 py-8">
-              <button onClick={start} className="btn-gold rounded-lg px-8 py-3 text-sm tracking-wide">
+              <button
+                onClick={start}
+                className="btn-gold rounded-lg px-8 py-3 text-sm tracking-wide"
+              >
                 Start Tuner
               </button>
               {error && (
@@ -178,8 +182,12 @@ function TunerPage() {
 
               <div className="w-full max-w-sm">
                 <div className="relative flex h-14 items-center">
-                  <span className="absolute -left-1 z-10 text-lg text-emerald-600/60 select-none">♭</span>
-                  <span className="absolute -right-1 z-10 text-lg text-emerald-600/60 select-none">♯</span>
+                  <span className="absolute -left-1 z-10 text-lg text-emerald-600/60 select-none">
+                    ♭
+                  </span>
+                  <span className="absolute -right-1 z-10 text-lg text-emerald-600/60 select-none">
+                    ♯
+                  </span>
 
                   <div className="relative mx-5 w-full h-full">
                     <div className="absolute inset-0 flex items-center">
@@ -219,7 +227,10 @@ function TunerPage() {
                     {note !== "—" && (
                       <div
                         className="absolute bottom-0 flex flex-col items-center transition-all duration-75"
-                        style={{ left: `${((clampedCents + 50) / 100) * 100}%`, transform: "translateX(-50%)" }}
+                        style={{
+                          left: `${((clampedCents + 50) / 100) * 100}%`,
+                          transform: "translateX(-50%)",
+                        }}
                       >
                         <div
                           className={`h-4 w-0.5 rounded-full ${inTune ? "bg-emerald-400" : "bg-emerald-500/50"}`}
@@ -229,7 +240,8 @@ function TunerPage() {
                             inTune ? "text-emerald-400 font-bold" : "text-text-muted"
                           }`}
                         >
-                          {clampedCents > 0 ? "+" : ""}{Math.round(clampedCents)}&cent;
+                          {clampedCents > 0 ? "+" : ""}
+                          {Math.round(clampedCents)}&cent;
                         </span>
                       </div>
                     )}
@@ -238,9 +250,7 @@ function TunerPage() {
               </div>
 
               {freq > 0 && (
-                <p className="font-mono text-xs tracking-wide text-text-muted">
-                  {freq} Hz
-                </p>
+                <p className="font-mono text-xs tracking-wide text-text-muted">{freq} Hz</p>
               )}
 
               <div className="flex flex-wrap justify-center gap-1">

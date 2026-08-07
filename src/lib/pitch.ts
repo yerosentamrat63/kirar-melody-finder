@@ -7,7 +7,7 @@ export function yinDetect(
   buf: Float32Array,
   sampleRate: number,
   minFreq = 40,
-  threshold = 0.1
+  threshold = 0.1,
 ): { freq: number; clarity: number } | null {
   const SIZE = buf.length;
   let maxLag = Math.min(SIZE - 2, Math.floor(sampleRate / minFreq));
@@ -55,7 +55,7 @@ export function yinDetect(
   const x2 = dNorm[tau + 1];
   const denom = x0 - 2 * x1 + x2;
   if (denom !== 0) {
-    const delta = 0.5 * (x0 - x2) / denom;
+    const delta = (0.5 * (x0 - x2)) / denom;
     if (Math.abs(delta) < 1) betterTau = tau + delta;
   }
 
@@ -149,11 +149,17 @@ export interface KignitMatch {
 // Normalize + Pearson correlation between two 12-vectors
 function correlate(a: number[], b: number[]): number {
   const mean = (x: number[]) => x.reduce((s, v) => s + v, 0) / x.length;
-  const ma = mean(a), mb = mean(b);
-  let num = 0, da = 0, db = 0;
+  const ma = mean(a),
+    mb = mean(b);
+  let num = 0,
+    da = 0,
+    db = 0;
   for (let i = 0; i < 12; i++) {
-    const va = a[i] - ma, vb = b[i] - mb;
-    num += va * vb; da += va * va; db += vb * vb;
+    const va = a[i] - ma,
+      vb = b[i] - mb;
+    num += va * vb;
+    da += va * va;
+    db += vb * vb;
   }
   const den = Math.sqrt(da * db);
   return den === 0 ? 0 : num / den;
