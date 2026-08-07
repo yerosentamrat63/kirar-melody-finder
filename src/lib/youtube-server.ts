@@ -569,6 +569,58 @@ async function handleDiag(url: URL): Promise<Response> {
       },
     },
     {
+      name: "WEB_EMBEDDED_PLAYER embed-fallback",
+      ua: UA_CHROME_WIN,
+      xn: "56",
+      xv: "2.20240718.01.00",
+      ctx: {
+        client: {
+          clientName: "WEB_EMBEDDED_PLAYER",
+          clientVersion: "2.20240718.01.00",
+          clientScreen: "EMBED",
+          userAgent: UA_CHROME_WIN,
+          hl: "en",
+          gl: "US",
+        },
+        thirdParty: { embedUrl: "https://www.youtube.com" },
+      },
+    },
+    {
+      name: "WEB_EMBEDDED_PLAYER 1.20240625.01.00 videoEmbed",
+      ua: UA_CHROME_WIN,
+      xn: "56",
+      xv: "1.20240625.01.00",
+      ctx: {
+        client: {
+          clientName: "WEB_EMBEDDED_PLAYER",
+          clientVersion: "1.20240625.01.00",
+          clientScreen: "EMBED",
+          userAgent: UA_CHROME_WIN,
+          hl: "en",
+          gl: "US",
+        },
+        thirdParty: { embedUrl: "https://kirar-melody-finder.vercel.app" },
+      },
+    },
+    {
+      name: "web_safari",
+      ua: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15",
+      xn: "59",
+      xv: "1.20240625.01.00",
+      ctx: {
+        client: {
+          clientName: "WEB",
+          clientVersion: "1.20240625.01.00",
+          clientScreen: "WATCH",
+          userAgent:
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15",
+          hl: "en",
+          gl: "US",
+        },
+        serviceIntegrityDimensions: { poToken: null },
+      },
+    },
+    {
       name: "WEB 2.20240718.02.00",
       ua: UA_CHROME_WIN,
       xn: "1",
