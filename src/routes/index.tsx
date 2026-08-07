@@ -95,6 +95,13 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+function freqToNoteName(freq: number): string {
+  const noteNum = 12 * (Math.log(freq / 440) / Math.log(2)) + 69;
+  const octave = Math.floor(noteNum / 12) - 1;
+  const pc = Math.round(((noteNum % 12) + 12) % 12);
+  return `${PITCH_NAMES[pc]}${octave}`;
+}
+
 function Index() {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -102,6 +109,8 @@ function Index() {
   const [matches, setMatches] = useState<KignitMatch[]>([]);
   const [elapsed, setElapsed] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [liveLevel, setLiveLevel] = useState(0);
+  const [liveFreq, setLiveFreq] = useState(0);
 
   const [segmentStart, setSegmentStart] = useState(0);
   const [segmentEnd, setSegmentEnd] = useState(100);
@@ -168,7 +177,11 @@ function Index() {
 
       const tick = () => {
         analyser.getFloatTimeDomainData(buf);
+        let sum = 0;
+        for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+        setLiveLevel(Math.sqrt(sum / buf.length));
         const freq = autoCorrelate(buf, ctx.sampleRate);
+        setLiveFreq(freq);
         if (freq > 60 && freq < 1500) {
           const pc = freqToPitchClass(freq);
           histRef.current[pc] += 1;
@@ -406,6 +419,37 @@ function Index() {
               </label>
             )}
           </div>
+
+          {status === "recording" && (
+            <div className="mt-4 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-4">
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-[10px] font-sans uppercase tracking-[0.15em] text-emerald-500/50">
+                  Live input
+                </span>
+                <span
+                  className={`font-mono text-xs ${
+                    liveFreq > 0 ? "text-emerald-300" : "text-text-muted"
+                  }`}
+                >
+                  {liveFreq > 0
+                    ? `${freqToNoteName(liveFreq)} · ${liveFreq.toFixed(0)} Hz`
+                    : "… no clear pitch"}
+                </span>
+              </div>
+              <div className="h-2 overflow-hidden rounded-full bg-emerald-500/10">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-emerald-700 to-emerald-400 transition-[width] duration-75"
+                  style={{ width: `${Math.min(100, liveLevel * 400)}%` }}
+                />
+              </div>
+              {liveLevel < 0.01 && elapsed > 2 && (
+                <p className="mt-2 text-[11px] leading-relaxed text-text-muted">
+                  Mic level is very low — nothing is reaching it. If music is playing, the phone may
+                  be muting it while the microphone is recording.
+                </p>
+              )}
+            </div>
+          )}
 
           {status !== "cropping" && status !== "loading" && status !== "recording" && (
             <p className="mt-4 border-t border-emerald-500/10 pt-4 text-[11px] leading-relaxed text-text-muted">
