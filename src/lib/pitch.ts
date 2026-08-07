@@ -63,8 +63,11 @@ export function yinDetect(
 }
 
 // Backwards-compatible wrapper for callers that only need the frequency.
+// Uses a permissive YIN threshold: a pitch-class histogram only needs recall,
+// octave errors map to the same class and noise is filtered by the caller's
+// frequency band, so rejecting frames is worse than accepting a rare bad one.
 export function autoCorrelate(buf: Float32Array, sampleRate: number): number {
-  const result = yinDetect(buf, sampleRate);
+  const result = yinDetect(buf, sampleRate, 40, 0.4);
   return result ? result.freq : -1;
 }
 

@@ -412,7 +412,7 @@ function Index() {
     const analysisSr = 4000;
 
     const windowSize = 1024;
-    const hop = 512;
+    const hop = 256;
     const totalWindows = Math.floor((segmentData.length - windowSize) / hop);
     let lastYield = performance.now();
 
