@@ -6,8 +6,8 @@
 
 @theme inline {
   --font-serif: "Playfair Display", "Georgia", serif;
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+  --font-sans: "Geist", "Inter", system-ui, sans-serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", monospace;
 
   --radius-sm: 4px;
   --radius-md: 6px;
@@ -15,21 +15,23 @@
   --radius-xl: 12px;
   --radius-2xl: 16px;
 
-  --color-parchment: #ecfdf5;
-  --color-parchment-dark: #a7f3d0;
-  --color-ink: #06130e;
-  --color-ink-light: #0b1f17;
-  --color-ink-card: #0d241b;
-  --color-gold: #10b981;
-  --color-gold-light: #34d399;
-  --color-gold-muted: #059669;
-  --color-gold-faint: rgba(16, 185, 129, 0.15);
-  --color-border-gold: rgba(16, 185, 129, 0.22);
-  --color-border-gold-strong: rgba(16, 185, 129, 0.38);
-  --color-text-primary: #ecfdf5;
-  --color-text-secondary: #a7f3d0;
-  --color-text-muted: rgba(167, 243, 208, 0.55);
+  /* Dark manuscript: warm charcoal paper, parchment ink, single emerald accent */
+  --color-parchment: #f4f1ea;
+  --color-parchment-dark: #cbc6ba;
+  --color-ink: #0b0b0c;
+  --color-ink-light: #121214;
+  --color-ink-card: #16161a;
+  --color-gold: #34d399;
+  --color-gold-light: #6ee7b7;
+  --color-gold-muted: #0f9b6c;
+  --color-gold-faint: rgba(52, 211, 153, 0.1);
+  --color-border-gold: rgba(244, 241, 234, 0.09);
+  --color-border-gold-strong: rgba(52, 211, 153, 0.35);
+  --color-text-primary: #f4f1ea;
+  --color-text-secondary: #b6b1a6;
+  --color-text-muted: rgba(182, 177, 166, 0.6);
 }
+
 
 @layer base {
   * {
