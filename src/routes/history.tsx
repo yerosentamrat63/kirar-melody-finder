@@ -132,7 +132,7 @@ function HistoryPage() {
                   </button>
 
                   {expanded === entry.id && (
-                    <div className="border-t border-emerald-500/10 px-4 py-4">
+                    <div className="border-t border-border-gold px-4 py-4">
                       <div className="mb-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-text-muted">
                         <span>Method: {entry.method === "mic" ? "Microphone" : "File upload"}</span>
                         {entry.name && <span>Name: {entry.name}</span>}
@@ -148,7 +148,7 @@ function HistoryPage() {
                             className={`rounded-lg border p-3 ${
                               idx === 0
                                 ? "border-emerald-500/30 bg-emerald-500/8"
-                                : "border-emerald-500/10"
+                                : "border-border-gold"
                             }`}
                           >
                             <div className="flex items-baseline justify-between gap-2">
