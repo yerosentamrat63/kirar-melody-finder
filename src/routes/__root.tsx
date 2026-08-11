@@ -132,7 +132,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function Nav() {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-emerald-500/10 bg-[#06130e]">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border-gold bg-ink-light/95 backdrop-blur">
       <div className="mx-auto flex max-w-lg items-center justify-around">
         <Link
           to="/"
