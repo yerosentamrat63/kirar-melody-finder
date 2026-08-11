@@ -20,8 +20,8 @@ export default defineConfig({
     plugins: [
       ...VitePWA({
         strategies: "injectManifest",
-        swSrc: "public/sw.js",
-        swDest: "sw.js",
+        srcDir: "public",
+        filename: "sw.js",
         injectManifest: {
           injectionPoint: undefined,
         },
@@ -30,8 +30,9 @@ export default defineConfig({
           short_name: "ቅኝት Finder",
           description:
             "Detect the ቅኝት (kignit) of Ethiopian kirar and begena mezmurs by listening or uploading audio.",
-          theme_color: "#06130e",
-          background_color: "#06130e",
+          theme_color: "#0b0b0c",
+          background_color: "#0b0b0c",
+
           display: "standalone",
           orientation: "portrait",
           start_url: "/",
