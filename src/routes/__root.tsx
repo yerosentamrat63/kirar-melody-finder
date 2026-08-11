@@ -136,7 +136,7 @@ function Nav() {
       <div className="mx-auto flex max-w-lg items-center justify-around">
         <Link
           to="/"
-          className="group flex flex-1 flex-col items-center gap-0.5 px-3 py-2.5 text-[10px] font-sans font-medium uppercase tracking-[0.12em] text-emerald-200/40 transition-colors duration-200 hover:text-emerald-200/70 aria-[current]:text-emerald-400"
+          className="group flex flex-1 flex-col items-center gap-0.5 px-3 py-2.5 text-[10px] font-sans font-medium uppercase tracking-[0.12em] text-text-muted transition-colors duration-200 hover:text-text-secondary aria-[current]:text-emerald-400"
           activeProps={{ className: "text-emerald-400" }}
           inactiveProps={{}}
         >
@@ -148,7 +148,7 @@ function Nav() {
         </Link>
         <Link
           to="/kignits"
-          className="group flex flex-1 flex-col items-center gap-0.5 px-3 py-2.5 text-[10px] font-sans font-medium uppercase tracking-[0.12em] text-emerald-200/40 transition-colors duration-200 hover:text-emerald-200/70 aria-[current]:text-emerald-400"
+          className="group flex flex-1 flex-col items-center gap-0.5 px-3 py-2.5 text-[10px] font-sans font-medium uppercase tracking-[0.12em] text-text-muted transition-colors duration-200 hover:text-text-secondary aria-[current]:text-emerald-400"
           activeProps={{ className: "text-emerald-400" }}
           inactiveProps={{}}
         >
@@ -160,7 +160,7 @@ function Nav() {
         </Link>
         <Link
           to="/tuner"
-          className="group flex flex-1 flex-col items-center gap-0.5 px-2 py-2.5 text-[10px] font-sans font-medium uppercase tracking-[0.12em] text-emerald-200/40 transition-colors duration-200 hover:text-emerald-200/70 aria-[current]:text-emerald-400"
+          className="group flex flex-1 flex-col items-center gap-0.5 px-2 py-2.5 text-[10px] font-sans font-medium uppercase tracking-[0.12em] text-text-muted transition-colors duration-200 hover:text-text-secondary aria-[current]:text-emerald-400"
           activeProps={{ className: "text-emerald-400" }}
           inactiveProps={{}}
         >
@@ -172,7 +172,7 @@ function Nav() {
         </Link>
         <Link
           to="/history"
-          className="group flex flex-1 flex-col items-center gap-0.5 px-2 py-2.5 text-[10px] font-sans font-medium uppercase tracking-[0.12em] text-emerald-200/40 transition-colors duration-200 hover:text-emerald-200/70 aria-[current]:text-emerald-400"
+          className="group flex flex-1 flex-col items-center gap-0.5 px-2 py-2.5 text-[10px] font-sans font-medium uppercase tracking-[0.12em] text-text-muted transition-colors duration-200 hover:text-text-secondary aria-[current]:text-emerald-400"
           activeProps={{ className: "text-emerald-400" }}
           inactiveProps={{}}
         >

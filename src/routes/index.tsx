@@ -444,7 +444,7 @@ function Index() {
                     : "… no clear pitch"}
                 </span>
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-emerald-500/10">
+              <div className="h-2 overflow-hidden rounded-full bg-parchment/10">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-emerald-700 to-emerald-400 transition-[width] duration-75"
                   style={{ width: `${Math.min(100, liveLevel * 400)}%` }}
@@ -460,7 +460,7 @@ function Index() {
           )}
 
           {status !== "cropping" && status !== "loading" && status !== "recording" && (
-            <p className="mt-4 border-t border-emerald-500/10 pt-4 text-[11px] leading-relaxed text-text-muted">
+            <p className="mt-4 border-t border-border-gold pt-4 text-[11px] leading-relaxed text-text-muted">
               You can also detect a mezmur playing in another app — start it on Samsung Music or
               YouTube Music, then press "Listen to Mezmur" and it will listen to what's playing from
               the speaker.
@@ -490,7 +490,7 @@ function Index() {
                 <span>Analyzing segment</span>
                 <span>{progress}%</span>
               </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-emerald-500/10">
+              <div className="h-1.5 overflow-hidden rounded-full bg-parchment/10">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400 transition-all duration-300"
                   style={{ width: `${progress}%` }}
@@ -501,7 +501,7 @@ function Index() {
 
           {status === "cropping" && (
             <div className="mt-6">
-              <div className="mb-3 flex items-center justify-between border-b border-emerald-500/10 pb-2 text-xs font-sans tracking-wide text-text-muted">
+              <div className="mb-3 flex items-center justify-between border-b border-border-gold pb-2 text-xs font-sans tracking-wide text-text-muted">
                 <span className="truncate">{fileName}</span>
                 <span>{formatTime(fileDuration)} total</span>
               </div>
@@ -526,7 +526,7 @@ function Index() {
                 />
               </div>
 
-              <div className="mt-4 flex items-center justify-between rounded-lg border border-emerald-500/10 bg-emerald-500/5 px-3 py-2 text-xs tracking-wide text-text-secondary">
+              <div className="mt-4 flex items-center justify-between rounded-lg border border-border-gold bg-emerald-500/5 px-3 py-2 text-xs tracking-wide text-text-secondary">
                 <span>Selected: {formatTime(selectedDuration)}</span>
                 <span>Max: {MAX_SEGMENT_SECONDS}s</span>
               </div>
@@ -577,7 +577,7 @@ function Index() {
 
         {matches.length > 0 && (
           <section className="mt-10">
-            <div className="mb-5 flex items-center justify-between border-b border-emerald-500/10 pb-3">
+            <div className="mb-5 flex items-center justify-between border-b border-border-gold pb-3">
               <h2 className="font-serif text-xl font-semibold tracking-tight text-emerald-300">
                 Detected Kignit
               </h2>
